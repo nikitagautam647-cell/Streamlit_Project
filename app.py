@@ -14,26 +14,6 @@ st.title("📦 Nassau Candy Logistics & Sales Dashboard")
 # =========================
 df = pd.read_excel("Nassau Candy Distributor main sheet.xlsx")
 
-# CLEAN COLUMN NAMES (SAFE FIX)
-df.columns = (
-    df.columns.str.strip()
-    .str.replace(" ", "_")
-    .str.replace("/", "_")
-)
-
-# =========================
-# CHECK COLUMN SAFETY
-# =========================
-if "State_Province" not in df.columns:
-    st.error("State_Province column not found. Please check Excel file columns.")
-    st.write("Available columns:", df.columns)
-    st.stop()
-
-if "Ship_Mode" not in df.columns:
-    st.error("Ship_Mode column not found in dataset.")
-    st.write("Available columns:", df.columns)
-    st.stop()
-
 # =========================
 # SIDEBAR FILTERS
 # =========================
@@ -103,15 +83,14 @@ if "Sales" in filtered_df.columns and "Profit" in filtered_df.columns:
 # =========================
 st.subheader("🏆 Top 10 States by Profit")
 
-if "State_Province" in filtered_df.columns:
-    top_states = (
-        filtered_df.groupby("State_Province")["Profit"]
-        .sum()
-        .sort_values(ascending=False)
-        .head(10)
-    )
+top_states = (
+    filtered_df.groupby("State_Province")["Profit"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(10)
+)
 
-    st.bar_chart(top_states)
+st.bar_chart(top_states)
 
 # =========================
 # LOGISTICS ANALYSIS
