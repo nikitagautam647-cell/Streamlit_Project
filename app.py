@@ -15,28 +15,31 @@ st.title("📦 Nassau Candy Logistics & Sales Dashboard")
 df = pd.read_excel("nassau_data.xlsx", header=0)
 
 # =========================
-# CLEAN COLUMNS
+# CLEAN COLUMNS (standardize)
 # =========================
-df.columns = (
-    df.columns.str.strip()
-    .str.replace(" ", "_")
-    .str.replace("/", "_")
-)
+df.columns = df.columns.str.strip()
 
 # =========================
-# DEBUG (optional - remove later)
+# RENAME (IMPORTANT STEP)
 # =========================
-st.write("Columns Found:", df.columns)
+df = df.rename(columns={
+    "State_province": "State_Province",
+    "ship_mode": "Ship_Mode",
+    "sales": "Sales",
+    "gross_profit": "Profit",
+    "lead_time_actual": "Lead_Time"
+})
 
 # =========================
-# REQUIRED COLUMNS CHECK
+# SAFETY CHECK
 # =========================
 required_cols = ["State_Province", "Ship_Mode", "Sales", "Profit", "Lead_Time"]
 
 missing = [col for col in required_cols if col not in df.columns]
 
 if missing:
-    st.error(f"Missing columns in Excel: {missing}")
+    st.error(f"Missing columns: {missing}")
+    st.write("Available columns:", df.columns)
     st.stop()
 
 # =========================
@@ -79,7 +82,7 @@ col3.metric("Total Profit", round(filtered_df["Profit"].sum(), 2))
 st.markdown("---")
 
 # =========================
-# SALES ANALYSIS
+# SALES vs PROFIT
 # =========================
 st.subheader("💰 Sales vs Profit")
 
@@ -107,9 +110,9 @@ top_states = (
 st.bar_chart(top_states)
 
 # =========================
-# LOGISTICS ANALYSIS
+# SHIPPING ANALYSIS
 # =========================
-st.subheader("🚚 Ship Mode Analysis")
+st.subheader("🚚 Ship Mode vs Lead Time")
 
 fig2 = px.box(
     filtered_df,
