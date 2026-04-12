@@ -2,26 +2,16 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# =========================
-# PAGE SETUP
-# =========================
 st.set_page_config(page_title="Nassau Dashboard", layout="wide")
-
 st.title("📦 Nassau Candy Logistics & Sales Dashboard")
 
-# =========================
 # LOAD DATA
-# =========================
 df = pd.read_excel("nassau_data.xlsx", header=0)
 
-# =========================
-# CLEAN COLUMNS (standardize)
-# =========================
+# CLEAN COLUMNS (IMPORTANT)
 df.columns = df.columns.str.strip()
 
-# =========================
-# RENAME (IMPORTANT STEP)
-# =========================
+# RENAME EXACT MATCH (YOUR DATA KE HISAB SE)
 df = df.rename(columns={
     "State_province": "State_Province",
     "ship_mode": "Ship_Mode",
@@ -30,21 +20,10 @@ df = df.rename(columns={
     "lead_time_actual": "Lead_Time"
 })
 
-# =========================
-# SAFETY CHECK
-# =========================
-required_cols = ["State_Province", "Ship_Mode", "Sales", "Profit", "Lead_Time"]
+# DEBUG (1 time check)
+st.write("Columns:", df.columns)
 
-missing = [col for col in required_cols if col not in df.columns]
-
-if missing:
-    st.error(f"Missing columns: {missing}")
-    st.write("Available columns:", df.columns)
-    st.stop()
-
-# =========================
-# SIDEBAR FILTERS
-# =========================
+# FILTERS
 st.sidebar.header("Filters")
 
 state_filter = st.sidebar.multiselect(
@@ -57,9 +36,6 @@ ship_filter = st.sidebar.multiselect(
     df["Ship_Mode"].dropna().unique()
 )
 
-# =========================
-# FILTER DATA
-# =========================
 filtered_df = df.copy()
 
 if state_filter:
@@ -68,9 +44,7 @@ if state_filter:
 if ship_filter:
     filtered_df = filtered_df[filtered_df["Ship_Mode"].isin(ship_filter)]
 
-# =========================
-# KPIs
-# =========================
+# KPI
 st.subheader("📊 Key Metrics")
 
 col1, col2, col3 = st.columns(3)
@@ -81,9 +55,7 @@ col3.metric("Total Profit", round(filtered_df["Profit"].sum(), 2))
 
 st.markdown("---")
 
-# =========================
 # SALES vs PROFIT
-# =========================
 st.subheader("💰 Sales vs Profit")
 
 fig1 = px.scatter(
@@ -95,24 +67,15 @@ fig1 = px.scatter(
 
 st.plotly_chart(fig1, use_container_width=True)
 
-# =========================
 # TOP STATES
-# =========================
-st.subheader("🏆 Top 10 States by Profit")
+st.subheader("🏆 Top States")
 
-top_states = (
-    filtered_df.groupby("State_Province")["Profit"]
-    .sum()
-    .sort_values(ascending=False)
-    .head(10)
-)
+top_states = filtered_df.groupby("State_Province")["Profit"].sum().sort_values(ascending=False).head(10)
 
 st.bar_chart(top_states)
 
-# =========================
-# SHIPPING ANALYSIS
-# =========================
-st.subheader("🚚 Ship Mode vs Lead Time")
+# SHIPPING
+st.subheader("🚚 Shipping Analysis")
 
 fig2 = px.box(
     filtered_df,
