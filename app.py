@@ -14,12 +14,25 @@ st.title("📦 Nassau Candy Logistics & Sales Dashboard")
 # =========================
 df = pd.read_excel("Nassau Candy Distributor main sheet.xlsx")
 
-# CLEAN COLUMN NAMES (IMPORTANT FIX)
+# CLEAN COLUMN NAMES (SAFE FIX)
 df.columns = (
     df.columns.str.strip()
     .str.replace(" ", "_")
     .str.replace("/", "_")
 )
+
+# =========================
+# CHECK COLUMN SAFETY
+# =========================
+if "State_Province" not in df.columns:
+    st.error("State_Province column not found. Please check Excel file columns.")
+    st.write("Available columns:", df.columns)
+    st.stop()
+
+if "Ship_Mode" not in df.columns:
+    st.error("Ship_Mode column not found in dataset.")
+    st.write("Available columns:", df.columns)
+    st.stop()
 
 # =========================
 # SIDEBAR FILTERS
@@ -36,7 +49,9 @@ ship_filter = st.sidebar.multiselect(
     df["Ship_Mode"].dropna().unique()
 )
 
+# =========================
 # FILTER DATA
+# =========================
 filtered_df = df.copy()
 
 if state_filter:
@@ -48,55 +63,66 @@ if ship_filter:
 # =========================
 # KPIs
 # =========================
-st.subheader("📊 Key Performance Indicators")
+st.subheader("📊 Key Metrics")
 
 col1, col2, col3 = st.columns(3)
 
 col1.metric("Total Orders", len(filtered_df))
-col2.metric("Avg Lead Time", round(filtered_df["Lead_Time"].mean(), 2))
-col3.metric("Total Profit", round(filtered_df["Profit"].sum(), 2))
+
+col2.metric(
+    "Avg Lead Time",
+    round(filtered_df["Lead_Time"].mean(), 2)
+    if "Lead_Time" in filtered_df.columns else 0
+)
+
+col3.metric(
+    "Total Profit",
+    round(filtered_df["Profit"].sum(), 2)
+    if "Profit" in filtered_df.columns else 0
+)
 
 st.markdown("---")
 
 # =========================
 # SALES ANALYSIS
 # =========================
-st.subheader("💰 Sales Analysis")
+st.subheader("💰 Sales vs Profit")
 
-fig1 = px.scatter(
-    filtered_df,
-    x="Sales",
-    y="Profit",
-    color="State_Province",
-    title="Sales vs Profit"
-)
-
-st.plotly_chart(fig1, use_container_width=True)
+if "Sales" in filtered_df.columns and "Profit" in filtered_df.columns:
+    fig1 = px.scatter(
+        filtered_df,
+        x="Sales",
+        y="Profit",
+        color="State_Province",
+        title="Sales vs Profit Analysis"
+    )
+    st.plotly_chart(fig1, use_container_width=True)
 
 # =========================
 # TOP STATES
 # =========================
-st.subheader("🏆 Top Performing States")
+st.subheader("🏆 Top 10 States by Profit")
 
-top_states = (
-    filtered_df.groupby("State_Province")["Profit"]
-    .sum()
-    .sort_values(ascending=False)
-    .head(10)
-)
+if "State_Province" in filtered_df.columns:
+    top_states = (
+        filtered_df.groupby("State_Province")["Profit"]
+        .sum()
+        .sort_values(ascending=False)
+        .head(10)
+    )
 
-st.bar_chart(top_states)
+    st.bar_chart(top_states)
 
 # =========================
 # LOGISTICS ANALYSIS
 # =========================
-st.subheader("🚚 Logistics Analysis")
+st.subheader("🚚 Ship Mode Analysis")
 
-fig2 = px.box(
-    filtered_df,
-    x="Ship_Mode",
-    y="Lead_Time",
-    title="Lead Time by Ship Mode"
-)
-
-st.plotly_chart(fig2, use_container_width=True)
+if "Ship_Mode" in filtered_df.columns:
+    fig2 = px.box(
+        filtered_df,
+        x="Ship_Mode",
+        y="Lead_Time",
+        title="Lead Time by Ship Mode"
+    )
+    st.plotly_chart(fig2, use_container_width=True)
