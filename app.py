@@ -7,9 +7,10 @@ st.set_page_config(page_title="Nassau Dashboard", layout="wide")
 st.title("📦 Nassau Candy Logistics & Sales Dashboard")
 
 # LOAD DATA
-df = pd.read_excel("Nassau Candy Distributor main sheet.xlsx")
+# Note: use the sheet file that was added in this commit
+df = pd.read_excel("Nassau Candy Distributor main sheet (1).xlsx")
 
-# CLEAN COLUMNS
+# CLEAN COLUMN NAMES
 df.columns = (
     df.columns.str.strip()
     .str.replace(" ", "_")
@@ -17,12 +18,14 @@ df.columns = (
 )
 
 # SAFETY CHECK
-if "State_Province" not in df.columns:
-    st.error("State_Province column not found in Excel file")
-    st.write(df.columns)
+required_cols = ["State_Province", "Ship_Mode", "Sales", "Profit", "Lead_Time"]
+missing = [col for col in required_cols if col not in df.columns]
+
+if missing:
+    st.error(f"Missing columns: {missing}")
     st.stop()
 
-# FILTERS
+# SIDEBAR FILTERS
 st.sidebar.header("Filters")
 
 state_filter = st.sidebar.multiselect(
@@ -55,7 +58,7 @@ col3.metric("Total Profit", round(filtered_df["Profit"].sum(), 2))
 
 st.markdown("---")
 
-# SALES CHART
+# SALES ANALYSIS
 st.subheader("💰 Sales vs Profit")
 
 fig1 = px.scatter(
@@ -68,7 +71,7 @@ fig1 = px.scatter(
 st.plotly_chart(fig1, use_container_width=True)
 
 # TOP STATES
-st.subheader("🏆 Top States by Profit")
+st.subheader("🏆 Top 10 States by Profit")
 
 top_states = (
     filtered_df.groupby("State_Province")["Profit"]
