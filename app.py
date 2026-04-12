@@ -2,32 +2,46 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+# =========================
 # PAGE SETUP
+# =========================
 st.set_page_config(page_title="Nassau Dashboard", layout="wide")
+
 st.title("📦 Nassau Candy Logistics & Sales Dashboard")
 
+# =========================
 # LOAD DATA
-# Note: use the sheet file that was added in this commit
-df = pd.read_excel(
-    "Nassau candy Distributor main sheet(1).xlsx",
-    header=0
-)
-# CLEAN COLUMN NAMES
+# =========================
+df = pd.read_excel("nassau_data.xlsx", header=0)
+
+# =========================
+# CLEAN COLUMNS
+# =========================
 df.columns = (
     df.columns.str.strip()
     .str.replace(" ", "_")
     .str.replace("/", "_")
 )
 
-# SAFETY CHECK
+# =========================
+# DEBUG (optional - remove later)
+# =========================
+st.write("Columns Found:", df.columns)
+
+# =========================
+# REQUIRED COLUMNS CHECK
+# =========================
 required_cols = ["State_Province", "Ship_Mode", "Sales", "Profit", "Lead_Time"]
+
 missing = [col for col in required_cols if col not in df.columns]
 
 if missing:
-    st.error(f"Missing columns: {missing}")
+    st.error(f"Missing columns in Excel: {missing}")
     st.stop()
 
+# =========================
 # SIDEBAR FILTERS
+# =========================
 st.sidebar.header("Filters")
 
 state_filter = st.sidebar.multiselect(
@@ -40,7 +54,9 @@ ship_filter = st.sidebar.multiselect(
     df["Ship_Mode"].dropna().unique()
 )
 
+# =========================
 # FILTER DATA
+# =========================
 filtered_df = df.copy()
 
 if state_filter:
@@ -49,7 +65,9 @@ if state_filter:
 if ship_filter:
     filtered_df = filtered_df[filtered_df["Ship_Mode"].isin(ship_filter)]
 
+# =========================
 # KPIs
+# =========================
 st.subheader("📊 Key Metrics")
 
 col1, col2, col3 = st.columns(3)
@@ -60,7 +78,9 @@ col3.metric("Total Profit", round(filtered_df["Profit"].sum(), 2))
 
 st.markdown("---")
 
+# =========================
 # SALES ANALYSIS
+# =========================
 st.subheader("💰 Sales vs Profit")
 
 fig1 = px.scatter(
@@ -72,7 +92,9 @@ fig1 = px.scatter(
 
 st.plotly_chart(fig1, use_container_width=True)
 
+# =========================
 # TOP STATES
+# =========================
 st.subheader("🏆 Top 10 States by Profit")
 
 top_states = (
@@ -84,7 +106,9 @@ top_states = (
 
 st.bar_chart(top_states)
 
-# LOGISTICS
+# =========================
+# LOGISTICS ANALYSIS
+# =========================
 st.subheader("🚚 Ship Mode Analysis")
 
 fig2 = px.box(
