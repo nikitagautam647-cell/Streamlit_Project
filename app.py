@@ -8,8 +8,10 @@ st.title("📦 Nassau Candy Logistics & Sales Dashboard")
 
 # LOAD DATA
 # Note: use the sheet file that was added in this commit
-df = pd.read_excel("Nassau Candy Distributor main sheet (1).xlsx")
-
+df = pd.read_excel(
+    "Nassau candy Distributor main sheet(1).xlsx",
+    header=0
+)
 # CLEAN COLUMN NAMES
 df.columns = (
     df.columns.str.strip()
