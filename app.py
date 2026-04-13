@@ -29,10 +29,10 @@ st.write("Columns in dataset:", df.columns.tolist())
 # =========================
 required_cols = [
     "State_province",
-    "ship_mode",
-    "sales",
-    "gross_profit",
-    "lead_time_actual"
+    "Ship_mode",
+    "Sales",
+    "Gross_profit",
+    "Lead_time_actual"
 ]
 
 missing = [col for col in required_cols if col not in df.columns]
