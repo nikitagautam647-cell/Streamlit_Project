@@ -2,219 +2,217 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# =========================
-# PAGE CONFIG
-# =========================
-st.set_page_config(page_title="Nassau Dashboard", layout="wide")
+st.set_page_config(layout="wide")
 
 # =========================
-# THEME (SECOND CLASS COLOR)
+# THEME
 # =========================
-PRIMARY = "#ce93d8"   # soft purple
-DARK = "#8e24aa"      # dark purple
-LIGHT_BG = "#f7f6f3"  # off white
-
-st.markdown(f"""
+st.markdown("""
 <style>
-.stApp {{
-    background-color: {LIGHT_BG};
-}}
-
-/* Titles */
-h1, h2, h3 {{
-    color: {DARK};
-}}
-
-/* KPI Cards */
-[data-testid="stMetric"] {{
-    background-color: {PRIMARY};
+.stApp {
+    background: linear-gradient(to right, #2b1d0e, #3e2723, #4e342e);
     color: white;
-    padding: 15px;
-    border-radius: 12px;
-    text-align: center;
-}}
+}
 
-/* Sidebar */
-section[data-testid="stSidebar"] {{
-    background-color: white;
-}}
+section[data-testid="stSidebar"] {
+    background-color: #1b0f08;
+}
+
+.card {
+    background-color: #4e342e;
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.kpi {
+    font-size: 26px;
+    font-weight: bold;
+    color: #ff80ab;
+}
+
+.desc {
+    font-size: 13px;
+    color: #fce4ec;
+}
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🍬 Nassau Candy Logistics & Sales Dashboard")
+st.title("🍬 Candy Logistics Intelligence Hub")
 
 # =========================
 # LOAD DATA
 # =========================
 df = pd.read_excel("streamlit excel.xlsx", index_col=0)
-
-df = df.loc[:, ~df.columns.str.contains("Unnamed", na=False)]
 df.columns = df.columns.str.strip()
 
-df["Order_Date"] = pd.to_datetime(df["Order_Date"])
-
 # =========================
-# SIDEBAR FILTERS
+# FILTERS
 # =========================
-st.sidebar.header("Filters")
+st.sidebar.title("Smart Filters")
 
-date_range = st.sidebar.date_input(
-    "Date Range",
-    [df["Order_Date"].min(), df["Order_Date"].max()]
-)
+state = st.sidebar.multiselect("State", df["State_Province"].unique())
+ship = st.sidebar.multiselect("Ship Mode", df["Ship_Mode"].unique())
 
-state_filter = st.sidebar.multiselect(
-    "State",
-    df["State_Province"].unique()
-)
-
-ship_filter = st.sidebar.multiselect(
-    "Ship Mode",
-    df["Ship_Mode"].unique()
-)
-
-lead_filter = st.sidebar.slider(
-    "Lead Time",
+lead = st.sidebar.slider(
+    "Lead Time Range",
     int(df["Lead_time_actual"].min()),
     int(df["Lead_time_actual"].max()),
-    (int(df["Lead_time_actual"].min(),), int(df["Lead_time_actual"].max()))
+    (5, 20)
 )
 
-# =========================
-# FILTER
-# =========================
-filtered_df = df.copy()
+filtered = df.copy()
 
-if len(date_range) == 2:
-    filtered_df = filtered_df[
-        (filtered_df["Order_Date"] >= pd.to_datetime(date_range[0])) &
-        (filtered_df["Order_Date"] <= pd.to_datetime(date_range[1]))
-    ]
+if state:
+    filtered = filtered[filtered["State_Province"].isin(state)]
 
-if state_filter:
-    filtered_df = filtered_df[filtered_df["State_Province"].isin(state_filter)]
+if ship:
+    filtered = filtered[filtered["Ship_Mode"].isin(ship)]
 
-if ship_filter:
-    filtered_df = filtered_df[filtered_df["Ship_Mode"].isin(ship_filter)]
-
-filtered_df = filtered_df[
-    (filtered_df["Lead_time_actual"] >= lead_filter[0]) &
-    (filtered_df["Lead_time_actual"] <= lead_filter[1])
+filtered = filtered[
+    (filtered["Lead_time_actual"] >= lead[0]) &
+    (filtered["Lead_time_actual"] <= lead[1])
 ]
 
 # =========================
 # KPI CARDS
 # =========================
-st.subheader("Key Metrics")
+c1, c2, c3, c4 = st.columns(4)
 
-c1, c2, c3 = st.columns(3)
+c1.markdown(f"""
+<div class="card">
+Orders<br>
+<div class="kpi">{len(filtered)}</div>
+<p class="desc">Total processed shipments</p>
+</div>
+""", unsafe_allow_html=True)
 
-c1.metric("Orders", len(filtered_df))
-c2.metric("Avg Lead Time", round(filtered_df["Lead_time_actual"].mean(), 2))
-c3.metric("Profit", round(filtered_df["Gross_Profit"].sum(), 2))
+c2.markdown(f"""
+<div class="card">
+Avg Delivery Time<br>
+<div class="kpi">{round(filtered["Lead_time_actual"].mean(),2)}</div>
+<p class="desc">Average shipping duration</p>
+</div>
+""", unsafe_allow_html=True)
 
-st.markdown("---")
+c3.markdown(f"""
+<div class="card">
+Total Profit<br>
+<div class="kpi">{round(filtered["Gross_Profit"].sum(),2)}</div>
+<p class="desc">Revenue after cost</p>
+</div>
+""", unsafe_allow_html=True)
 
-# =========================
-# GRAPH STYLE
-# =========================
-graph_layout = dict(
-    plot_bgcolor="#ffffff",
-    paper_bgcolor="#ffffff",
-    font=dict(color="#333")
-)
-
-# =========================
-# ROUTE EFFICIENCY
-# =========================
-st.subheader("Route Efficiency")
-
-route = filtered_df.groupby("Routes")["Lead_time_actual"].mean().sort_values()
-
-fig1 = px.bar(
-    route,
-    color=route.values,
-    color_continuous_scale=[PRIMARY, DARK]
-)
-
-fig1.update_layout(graph_layout, height=400)
-
-st.plotly_chart(fig1, use_container_width=True)
+c4.markdown(f"""
+<div class="card">
+Total Sales<br>
+<div class="kpi">{round(filtered["Sales"].sum(),2)}</div>
+<p class="desc">Overall business volume</p>
+</div>
+""", unsafe_allow_html=True)
 
 # =========================
-# SHIP MODE
+# TABS
 # =========================
-st.subheader("Ship Mode Comparison")
-
-fig2 = px.box(
-    filtered_df,
-    x="Ship_Mode",
-    y="Lead_time_actual",
-    color="Ship_Mode",
-    color_discrete_sequence=[PRIMARY, "#ba68c8", DARK]
-)
-
-fig2.update_layout(graph_layout, height=400)
-
-st.plotly_chart(fig2, use_container_width=True)
+tab1, tab2, tab3, tab4 = st.tabs([
+    "Performance Overview",
+    "Delay Risk Analysis",
+    "Delivery Efficiency",
+    "Smart Recommendations"
+])
 
 # =========================
-# SALES VS PROFIT
+# TAB 1 - OVERVIEW
 # =========================
-st.subheader("Sales vs Profit")
+with tab1:
+    st.subheader("Performance Overview")
 
-fig3 = px.scatter(
-    filtered_df,
-    x="Sales",
-    y="Gross_Profit",
-    color="Region",
-    color_discrete_sequence=[PRIMARY, "#ab47bc", DARK]
-)
+    col1, col2 = st.columns(2)
 
-fig3.update_layout(graph_layout, height=450)
+    fig1 = px.histogram(
+        filtered,
+        x="Lead_time_actual",
+        color_discrete_sequence=["#ff80ab"]
+    )
+    fig1.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
 
-st.plotly_chart(fig3, use_container_width=True)
+    col1.plotly_chart(fig1, use_container_width=True)
 
-# =========================
-# MAP
-# =========================
-st.subheader("Geographic Map")
+    fig2 = px.bar(
+        filtered.groupby("State_Province")["Gross_Profit"].sum().reset_index(),
+        x="State_Province",
+        y="Gross_Profit",
+        color_discrete_sequence=["#ff80ab"]
+    )
+    fig2.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
 
-map_data = filtered_df.groupby("State_Province")["Lead_time_actual"].mean().reset_index()
-
-fig4 = px.choropleth(
-    map_data,
-    locations="State_Province",
-    locationmode="USA-states",
-    color="Lead_time_actual",
-    scope="usa",
-    color_continuous_scale=[PRIMARY, DARK]
-)
-
-fig4.update_layout(graph_layout, height=500)
-
-st.plotly_chart(fig4, use_container_width=True)
+    col2.plotly_chart(fig2, use_container_width=True)
 
 # =========================
-# TOP STATES
+# TAB 2 - DELAY RISK
 # =========================
-st.subheader("Top States")
+with tab2:
+    st.subheader("Delay Risk Analysis")
 
-top_states = filtered_df.groupby("State_Province")["Gross_Profit"].sum().sort_values(ascending=False).head(10)
+    fig3 = px.pie(
+        filtered,
+        names="Dealyed_flag",
+        color_discrete_sequence=["#ff80ab", "#8d6e63"]
+    )
+    fig3.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
 
-fig5 = px.bar(
-    top_states,
-    color=top_states.values,
-    color_continuous_scale=[PRIMARY, DARK]
-)
-
-fig5.update_layout(graph_layout, height=400)
-
-st.plotly_chart(fig5, use_container_width=True)
+    st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
-# TABLE
+# TAB 3 - EFFICIENCY
 # =========================
-st.subheader("Detailed Data")
+with tab3:
+    st.subheader("Delivery Efficiency")
 
-st.dataframe(filtered_df, use_container_width=True)
+    fig4 = px.box(
+        filtered,
+        x="Ship_Mode",
+        y="Lead_time_actual",
+        color_discrete_sequence=["#ff80ab"]
+    )
+    fig4.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
+
+    st.plotly_chart(fig4, use_container_width=True)
+
+# =========================
+# TAB 4 - SMART INSIGHTS
+# =========================
+with tab4:
+    st.subheader("Smart Recommendations")
+
+    avg_lead = filtered["Lead_time_actual"].mean()
+
+    high_delay = filtered[filtered["Lead_time_actual"] > avg_lead]
+
+    top_state = high_delay.groupby("State_Province")["Lead_time_actual"].mean().idxmax()
+    worst_ship = filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().idxmax()
+    low_profit = filtered.groupby("State_Province")["Gross_Profit"].sum().idxmin()
+
+    st.markdown(f"""
+    <div class="card">
+
+    🚨 <b>High Delay State:</b> {top_state}  
+    → Needs immediate logistics optimization  
+    <br><br>
+
+    🚚 <b>Slowest Shipping Mode:</b> {worst_ship}  
+    → Improve delivery efficiency  
+    <br><br>
+
+    📉 <b>Lowest Profit Region:</b> {low_profit}  
+    → Requires business strategy improvement  
+    <br><br>
+
+    ⚡ <b>Recommended Actions:</b><br>
+    - Optimize high delay routes<br>
+    - Improve slow shipping methods<br>
+    - Focus on profitable regions<br>
+    - Reduce operational inefficiencies  
+
+    </div>
+    """, unsafe_allow_html=True)
