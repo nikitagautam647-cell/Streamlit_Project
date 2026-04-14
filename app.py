@@ -5,7 +5,7 @@ import plotly.express as px
 st.set_page_config(layout="wide")
 
 # =========================
-# THEME
+# THEME (Chocolate + Candy)
 # =========================
 st.markdown("""
 <style>
@@ -75,13 +75,13 @@ filtered = filtered[
 ]
 
 # =========================
-# KPI CARDS
+# KPI CARDS (EMOJI)
 # =========================
 c1, c2, c3, c4 = st.columns(4)
 
 c1.markdown(f"""
 <div class="card">
-Orders<br>
+🎯 Orders<br>
 <div class="kpi">{len(filtered)}</div>
 <p class="desc">Total processed shipments</p>
 </div>
@@ -89,7 +89,7 @@ Orders<br>
 
 c2.markdown(f"""
 <div class="card">
-Avg Delivery Time<br>
+⏱ Avg Delivery Time<br>
 <div class="kpi">{round(filtered["Lead_time_actual"].mean(),2)}</div>
 <p class="desc">Average shipping duration</p>
 </div>
@@ -97,7 +97,7 @@ Avg Delivery Time<br>
 
 c3.markdown(f"""
 <div class="card">
-Total Profit<br>
+💰 Total Profit<br>
 <div class="kpi">{round(filtered["Gross_Profit"].sum(),2)}</div>
 <p class="desc">Revenue after cost</p>
 </div>
@@ -105,7 +105,7 @@ Total Profit<br>
 
 c4.markdown(f"""
 <div class="card">
-Total Sales<br>
+📦 Total Sales<br>
 <div class="kpi">{round(filtered["Sales"].sum(),2)}</div>
 <p class="desc">Overall business volume</p>
 </div>
@@ -122,7 +122,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 ])
 
 # =========================
-# TAB 1 - OVERVIEW
+# TAB 1
 # =========================
 with tab1:
     st.subheader("Performance Overview")
@@ -135,7 +135,6 @@ with tab1:
         color_discrete_sequence=["#ff80ab"]
     )
     fig1.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
-
     col1.plotly_chart(fig1, use_container_width=True)
 
     fig2 = px.bar(
@@ -145,14 +144,15 @@ with tab1:
         color_discrete_sequence=["#ff80ab"]
     )
     fig2.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
-
     col2.plotly_chart(fig2, use_container_width=True)
 
 # =========================
-# TAB 2 - DELAY RISK
+# TAB 2 (2 GRAPHS)
 # =========================
 with tab2:
     st.subheader("Delay Risk Analysis")
+
+    col1, col2 = st.columns(2)
 
     fig3 = px.pie(
         filtered,
@@ -160,59 +160,104 @@ with tab2:
         color_discrete_sequence=["#ff80ab", "#8d6e63"]
     )
     fig3.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
+    col1.plotly_chart(fig3, use_container_width=True)
 
-    st.plotly_chart(fig3, use_container_width=True)
+    delay_ship = filtered.groupby("Ship_Mode")["Dealyed_flag"].count().reset_index()
+
+    fig4 = px.bar(
+        delay_ship,
+        x="Ship_Mode",
+        y="Dealyed_flag",
+        color_discrete_sequence=["#ff80ab"]
+    )
+    fig4.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
+    col2.plotly_chart(fig4, use_container_width=True)
 
 # =========================
-# TAB 3 - EFFICIENCY
+# TAB 3 (2 GRAPHS)
 # =========================
 with tab3:
     st.subheader("Delivery Efficiency")
 
-    fig4 = px.box(
+    col1, col2 = st.columns(2)
+
+    fig5 = px.box(
         filtered,
         x="Ship_Mode",
         y="Lead_time_actual",
         color_discrete_sequence=["#ff80ab"]
     )
-    fig4.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
+    fig5.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
+    col1.plotly_chart(fig5, use_container_width=True)
 
-    st.plotly_chart(fig4, use_container_width=True)
+    route_perf = filtered.groupby("Routes")["Lead_time_actual"].mean().reset_index()
+
+    fig6 = px.bar(
+        route_perf,
+        x="Routes",
+        y="Lead_time_actual",
+        color_discrete_sequence=["#ff80ab"]
+    )
+    fig6.update_layout(plot_bgcolor="#4e342e", paper_bgcolor="#4e342e", font_color="white")
+    col2.plotly_chart(fig6, use_container_width=True)
 
 # =========================
-# TAB 4 - SMART INSIGHTS
+# TAB 4 (SMART INSIGHTS)
 # =========================
 with tab4:
     st.subheader("Smart Recommendations")
 
-    avg_lead = filtered["Lead_time_actual"].mean()
+    if not filtered.empty:
 
-    high_delay = filtered[filtered["Lead_time_actual"] > avg_lead]
+        avg_lead = filtered["Lead_time_actual"].mean()
+        high_delay = filtered[filtered["Lead_time_actual"] > avg_lead]
 
-    top_state = high_delay.groupby("State_Province")["Lead_time_actual"].mean().idxmax()
-    worst_ship = filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().idxmax()
-    low_profit = filtered.groupby("State_Province")["Gross_Profit"].sum().idxmin()
+        top_state = high_delay["State_Province"].mode()[0] if not high_delay.empty else "N/A"
+        worst_ship = filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().idxmax()
+        low_profit = filtered.groupby("State_Province")["Gross_Profit"].sum().idxmin()
 
-    st.markdown(f"""
-    <div class="card">
+        st.markdown(f"""
+        <div class="card">
 
-    🚨 <b>High Delay State:</b> {top_state}  
-    → Needs immediate logistics optimization  
-    <br><br>
+        🚨 <b>High Delay State:</b> {top_state}<br>
+        This region is experiencing higher-than-average delivery delays.  
+        It indicates logistics inefficiencies and requires immediate operational focus.
 
-    🚚 <b>Slowest Shipping Mode:</b> {worst_ship}  
-    → Improve delivery efficiency  
-    <br><br>
+        <br><br>
 
-    📉 <b>Lowest Profit Region:</b> {low_profit}  
-    → Requires business strategy improvement  
-    <br><br>
+        🚚 <b>Slowest Shipping Mode:</b> {worst_ship}<br>
+        This shipping method contributes most to delays.  
+        Optimizing this can significantly improve delivery performance.
 
-    ⚡ <b>Recommended Actions:</b><br>
-    - Optimize high delay routes<br>
-    - Improve slow shipping methods<br>
-    - Focus on profitable regions<br>
-    - Reduce operational inefficiencies  
+        <br><br>
 
-    </div>
-    """, unsafe_allow_html=True)
+        📉 <b>Lowest Profit Region:</b> {low_profit}<br>
+        This region generates minimal profit.  
+        Strategic improvements and cost control are needed here.
+
+        </div>
+        """, unsafe_allow_html=True)
+
+# =========================
+# ACTION CENTER
+# =========================
+st.subheader("📌 Action Center")
+
+st.markdown("""
+<div class="card">
+
+🔴 <b>Priority Area: Shipping Operations</b><br>
+Focus on improving route planning and delivery coordination.
+
+<br><br>
+
+⚠ <b>Critical Mode: Standard Shipping</b><br>
+This mode shows higher delays and needs efficiency improvement.
+
+<br><br>
+
+📊 <b>Operational Insight</b><br>
+Reducing delays and optimizing logistics will directly improve profit and customer satisfaction.
+
+</div>
+""", unsafe_allow_html=True)
