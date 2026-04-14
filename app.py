@@ -3,25 +3,21 @@ import pandas as pd
 import plotly.express as px
 
 # =========================
-# COLORS (POWER BI MATCH)
-# =========================
-PRIMARY = "#d81b60"   # pink/magenta (United wala)
-DARK = "#880e4f"
-BLUE = "#1f77b4"      # filter blue
-BG = "#f7f6f3"
-
-# =========================
 # PAGE CONFIG
 # =========================
 st.set_page_config(page_title="Nassau Dashboard", layout="wide")
 
 # =========================
-# CUSTOM CSS
+# THEME (SECOND CLASS COLOR)
 # =========================
+PRIMARY = "#ce93d8"   # soft purple
+DARK = "#8e24aa"      # dark purple
+LIGHT_BG = "#f7f6f3"  # off white
+
 st.markdown(f"""
 <style>
 .stApp {{
-    background-color: {BG};
+    background-color: {LIGHT_BG};
 }}
 
 /* Titles */
@@ -35,26 +31,13 @@ h1, h2, h3 {{
     color: white;
     padding: 15px;
     border-radius: 12px;
+    text-align: center;
 }}
 
-/* Sidebar background */
+/* Sidebar */
 section[data-testid="stSidebar"] {{
     background-color: white;
 }}
-
-/* FILTER COLOR (BLUE) */
-div[data-baseweb="select"] > div {{
-    border-color: {BLUE} !important;
-}}
-
-div[data-baseweb="slider"] span {{
-    background-color: {BLUE} !important;
-}}
-
-div[data-baseweb="slider"] div {{
-    background-color: {BLUE} !important;
-}}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -94,11 +77,11 @@ lead_filter = st.sidebar.slider(
     "Lead Time",
     int(df["Lead_time_actual"].min()),
     int(df["Lead_time_actual"].max()),
-    (int(df["Lead_time_actual"].min()), int(df["Lead_time_actual"].max()))
+    (int(df["Lead_time_actual"].min(),), int(df["Lead_time_actual"].max()))
 )
 
 # =========================
-# FILTER DATA
+# FILTER
 # =========================
 filtered_df = df.copy()
 
@@ -120,7 +103,7 @@ filtered_df = filtered_df[
 ]
 
 # =========================
-# KPI
+# KPI CARDS
 # =========================
 st.subheader("Key Metrics")
 
@@ -135,27 +118,31 @@ st.markdown("---")
 # =========================
 # GRAPH STYLE
 # =========================
-layout = dict(
-    plot_bgcolor="white",
-    paper_bgcolor="white",
+graph_layout = dict(
+    plot_bgcolor="#ffffff",
+    paper_bgcolor="#ffffff",
     font=dict(color="#333")
 )
 
 # =========================
-# ROUTE
+# ROUTE EFFICIENCY
 # =========================
 st.subheader("Route Efficiency")
 
 route = filtered_df.groupby("Routes")["Lead_time_actual"].mean().sort_values()
 
-fig1 = px.bar(route, color=route.values,
-              color_continuous_scale=["#f8bbd0", PRIMARY])
+fig1 = px.bar(
+    route,
+    color=route.values,
+    color_continuous_scale=[PRIMARY, DARK]
+)
 
-fig1.update_layout(layout)
+fig1.update_layout(graph_layout, height=400)
+
 st.plotly_chart(fig1, use_container_width=True)
 
 # =========================
-# SHIP MODE (IMPORTANT FIX)
+# SHIP MODE
 # =========================
 st.subheader("Ship Mode Comparison")
 
@@ -164,10 +151,11 @@ fig2 = px.box(
     x="Ship_Mode",
     y="Lead_time_actual",
     color="Ship_Mode",
-    color_discrete_sequence=[PRIMARY, "#f06292", "#ad1457"]
+    color_discrete_sequence=[PRIMARY, "#ba68c8", DARK]
 )
 
-fig2.update_layout(layout)
+fig2.update_layout(graph_layout, height=400)
+
 st.plotly_chart(fig2, use_container_width=True)
 
 # =========================
@@ -180,14 +168,35 @@ fig3 = px.scatter(
     x="Sales",
     y="Gross_Profit",
     color="Region",
-    color_discrete_sequence=[PRIMARY, "#f06292", "#ad1457"]
+    color_discrete_sequence=[PRIMARY, "#ab47bc", DARK]
 )
 
-fig3.update_layout(layout)
+fig3.update_layout(graph_layout, height=450)
+
 st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
-# TOP STATES (IMPORTANT FIX)
+# MAP
+# =========================
+st.subheader("Geographic Map")
+
+map_data = filtered_df.groupby("State_Province")["Lead_time_actual"].mean().reset_index()
+
+fig4 = px.choropleth(
+    map_data,
+    locations="State_Province",
+    locationmode="USA-states",
+    color="Lead_time_actual",
+    scope="usa",
+    color_continuous_scale=[PRIMARY, DARK]
+)
+
+fig4.update_layout(graph_layout, height=500)
+
+st.plotly_chart(fig4, use_container_width=True)
+
+# =========================
+# TOP STATES
 # =========================
 st.subheader("Top States")
 
@@ -196,10 +205,11 @@ top_states = filtered_df.groupby("State_Province")["Gross_Profit"].sum().sort_va
 fig5 = px.bar(
     top_states,
     color=top_states.values,
-    color_continuous_scale=["#f8bbd0", PRIMARY]
+    color_continuous_scale=[PRIMARY, DARK]
 )
 
-fig5.update_layout(layout)
+fig5.update_layout(graph_layout, height=400)
+
 st.plotly_chart(fig5, use_container_width=True)
 
 # =========================
