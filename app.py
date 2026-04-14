@@ -8,23 +8,24 @@ import plotly.express as px
 st.set_page_config(page_title="Nassau Dashboard", layout="wide")
 
 # =========================
-# CUSTOM THEME (CHOCOLATE UI)
+# CUSTOM THEME (POWER BI STYLE)
 # =========================
 st.markdown("""
-    <style>
-    .stApp {
-        background-color: #2c1a14;
-        color: #f5e6d3;
-    }
-    h1, h2, h3 {
-        color: #ffb6a3;
-    }
-    .stMetric {
-        background-color: #3e2723;
-        padding: 10px;
-        border-radius: 10px;
-    }
-    </style>
+<style>
+.stApp {
+    background-color: #d6c28a;  /* golden background */
+    color: white;
+}
+h1, h2, h3 {
+    color: #4e342e;
+}
+[data-testid="stMetric"] {
+    background-color: #6d4c41;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+}
+</style>
 """, unsafe_allow_html=True)
 
 st.title("🍬 Nassau Candy Logistics & Sales Dashboard")
@@ -37,7 +38,6 @@ df = pd.read_excel("streamlit excel.xlsx", index_col=0)
 df = df.loc[:, ~df.columns.str.contains("Unnamed", na=False)]
 df.columns = df.columns.str.strip()
 
-# DATE
 df["Order_Date"] = pd.to_datetime(df["Order_Date"])
 
 # =========================
@@ -90,7 +90,7 @@ filtered_df = filtered_df[
 ]
 
 # =========================
-# KPIs
+# KPI
 # =========================
 st.subheader("📊 Key Metrics")
 
@@ -103,19 +103,26 @@ c3.metric("Profit", round(filtered_df["Gross_Profit"].sum(), 2))
 st.markdown("---")
 
 # =========================
-# ROUTE PERFORMANCE
+# COMMON GRAPH STYLE
+# =========================
+graph_layout = dict(
+    plot_bgcolor="#2b2b2b",
+    paper_bgcolor="#2b2b2b",
+    font=dict(color="white")
+)
+
+# =========================
+# ROUTE
 # =========================
 st.subheader("🚚 Route Efficiency")
 
 route = filtered_df.groupby("Routes")["Lead_time_actual"].mean().sort_values()
 
-fig1 = px.bar(
-    route,
-    color=route.values,
-    color_continuous_scale=["#ffb6a3", "#8d4b32"]
-)
+fig1 = px.bar(route, color=route.values,
+              color_continuous_scale=["#f4c27a", "#5d4037"])
 
-fig1.update_layout(height=400)
+fig1.update_layout(graph_layout, height=400)
+
 st.plotly_chart(fig1, use_container_width=True)
 
 # =========================
@@ -128,10 +135,11 @@ fig2 = px.box(
     x="Ship_Mode",
     y="Lead_time_actual",
     color="Ship_Mode",
-    color_discrete_sequence=["#ff8a65", "#a1887f", "#ffccbc"]
+    color_discrete_sequence=["#f4c27a", "#8d6e63", "#3e2723"]
 )
 
-fig2.update_layout(height=400)
+fig2.update_layout(graph_layout, height=400)
+
 st.plotly_chart(fig2, use_container_width=True)
 
 # =========================
@@ -144,10 +152,11 @@ fig3 = px.scatter(
     x="Sales",
     y="Gross_Profit",
     color="Region",
-    color_discrete_sequence=["#ffb6a3", "#d7a86e", "#a1887f"]
+    color_discrete_sequence=["#ffcc80", "#bcaaa4", "#6d4c41"]
 )
 
-fig3.update_layout(height=450)
+fig3.update_layout(graph_layout, height=450)
+
 st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
@@ -163,10 +172,11 @@ fig4 = px.choropleth(
     locationmode="USA-states",
     color="Lead_time_actual",
     scope="usa",
-    color_continuous_scale=["#ffe0b2", "#8d4b32"]
+    color_continuous_scale=["#fff3e0", "#5d4037"]
 )
 
-fig4.update_layout(height=500)
+fig4.update_layout(graph_layout, height=500)
+
 st.plotly_chart(fig4, use_container_width=True)
 
 # =========================
@@ -179,14 +189,15 @@ top_states = filtered_df.groupby("State_Province")["Gross_Profit"].sum().sort_va
 fig5 = px.bar(
     top_states,
     color=top_states.values,
-    color_continuous_scale=["#ffccbc", "#5d4037"]
+    color_continuous_scale=["#ffe0b2", "#4e342e"]
 )
 
-fig5.update_layout(height=400)
+fig5.update_layout(graph_layout, height=400)
+
 st.plotly_chart(fig5, use_container_width=True)
 
 # =========================
-# DATA TABLE
+# TABLE
 # =========================
 st.subheader("📋 Detailed Data")
 
