@@ -7,6 +7,26 @@ import plotly.express as px
 # =========================
 st.set_page_config(page_title="Nassau Dashboard", layout="wide")
 
+# =========================
+# CUSTOM THEME (CHOCOLATE UI)
+# =========================
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #2c1a14;
+        color: #f5e6d3;
+    }
+    h1, h2, h3 {
+        color: #ffb6a3;
+    }
+    .stMetric {
+        background-color: #3e2723;
+        padding: 10px;
+        border-radius: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("🍬 Nassau Candy Logistics & Sales Dashboard")
 
 # =========================
@@ -17,49 +37,41 @@ df = pd.read_excel("streamlit excel.xlsx", index_col=0)
 df = df.loc[:, ~df.columns.str.contains("Unnamed", na=False)]
 df.columns = df.columns.str.strip()
 
-# =========================
-# DATE CONVERSION
-# =========================
+# DATE
 df["Order_Date"] = pd.to_datetime(df["Order_Date"])
-df["Ship_Date"] = pd.to_datetime(df["Ship_Date"])
 
 # =========================
-# SIDEBAR FILTERS
+# SIDEBAR
 # =========================
 st.sidebar.header("🎛 Filters")
 
-# Date filter
 date_range = st.sidebar.date_input(
-    "Select Date Range",
+    "Date Range",
     [df["Order_Date"].min(), df["Order_Date"].max()]
 )
 
-# State filter
 state_filter = st.sidebar.multiselect(
-    "Select State",
+    "State",
     df["State_Province"].unique()
 )
 
-# Ship mode filter
 ship_filter = st.sidebar.multiselect(
     "Ship Mode",
     df["Ship_Mode"].unique()
 )
 
-# Lead time slider
 lead_filter = st.sidebar.slider(
-    "Lead Time Range",
+    "Lead Time",
     int(df["Lead_time_actual"].min()),
     int(df["Lead_time_actual"].max()),
     (int(df["Lead_time_actual"].min()), int(df["Lead_time_actual"].max()))
 )
 
 # =========================
-# APPLY FILTERS
+# FILTER
 # =========================
 filtered_df = df.copy()
 
-# Date filter apply
 if len(date_range) == 2:
     filtered_df = filtered_df[
         (filtered_df["Order_Date"] >= pd.to_datetime(date_range[0])) &
@@ -82,89 +94,100 @@ filtered_df = filtered_df[
 # =========================
 st.subheader("📊 Key Metrics")
 
-col1, col2, col3 = st.columns(3)
+c1, c2, c3 = st.columns(3)
 
-col1.metric("Total Orders", len(filtered_df))
-col2.metric("Avg Lead Time", round(filtered_df["Lead_time_actual"].mean(), 2))
-col3.metric("Total Profit", round(filtered_df["Gross_Profit"].sum(), 2))
+c1.metric("Orders", len(filtered_df))
+c2.metric("Avg Lead Time", round(filtered_df["Lead_time_actual"].mean(), 2))
+c3.metric("Profit", round(filtered_df["Gross_Profit"].sum(), 2))
 
 st.markdown("---")
 
 # =========================
-# ROUTE EFFICIENCY
+# ROUTE PERFORMANCE
 # =========================
-st.subheader("🚚 Route Efficiency Overview")
+st.subheader("🚚 Route Efficiency")
 
-route_perf = filtered_df.groupby("Routes")["Lead_time_actual"].mean().sort_values()
+route = filtered_df.groupby("Routes")["Lead_time_actual"].mean().sort_values()
 
-fig_route = px.bar(
-    route_perf,
-    color=route_perf.values,
-    color_continuous_scale="Reds"
+fig1 = px.bar(
+    route,
+    color=route.values,
+    color_continuous_scale=["#ffb6a3", "#8d4b32"]
 )
 
-st.plotly_chart(fig_route, use_container_width=True)
+fig1.update_layout(height=400)
+st.plotly_chart(fig1, use_container_width=True)
 
 # =========================
-# SHIP MODE COMPARISON
+# SHIP MODE
 # =========================
 st.subheader("📦 Ship Mode Comparison")
 
-fig_ship = px.box(
+fig2 = px.box(
     filtered_df,
     x="Ship_Mode",
     y="Lead_time_actual",
     color="Ship_Mode",
-    color_discrete_sequence=px.colors.sequential.Reds
+    color_discrete_sequence=["#ff8a65", "#a1887f", "#ffccbc"]
 )
 
-st.plotly_chart(fig_ship, use_container_width=True)
+fig2.update_layout(height=400)
+st.plotly_chart(fig2, use_container_width=True)
 
 # =========================
 # SALES VS PROFIT
 # =========================
 st.subheader("💰 Sales vs Profit")
 
-fig_sales = px.scatter(
+fig3 = px.scatter(
     filtered_df,
     x="Sales",
     y="Gross_Profit",
-    color="State_Province",
-    color_discrete_sequence=px.colors.sequential.RdPu
+    color="Region",
+    color_discrete_sequence=["#ffb6a3", "#d7a86e", "#a1887f"]
 )
 
-st.plotly_chart(fig_sales, use_container_width=True)
+fig3.update_layout(height=450)
+st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
-# MAP VISUALIZATION
+# MAP
 # =========================
-st.subheader("🗺 Geographic Shipping Map")
+st.subheader("🗺 Shipping Map")
 
 map_data = filtered_df.groupby("State_Province")["Lead_time_actual"].mean().reset_index()
 
-fig_map = px.choropleth(
+fig4 = px.choropleth(
     map_data,
     locations="State_Province",
     locationmode="USA-states",
     color="Lead_time_actual",
     scope="usa",
-    color_continuous_scale="Reds"
+    color_continuous_scale=["#ffe0b2", "#8d4b32"]
 )
 
-st.plotly_chart(fig_map, use_container_width=True)
+fig4.update_layout(height=500)
+st.plotly_chart(fig4, use_container_width=True)
 
 # =========================
-# STATE DRILL DOWN
+# TOP STATES
 # =========================
-st.subheader("🔍 State Level Insights")
+st.subheader("🏆 Top States")
 
-state_perf = filtered_df.groupby("State_Province")["Gross_Profit"].sum().sort_values(ascending=False)
+top_states = filtered_df.groupby("State_Province")["Gross_Profit"].sum().sort_values(ascending=False).head(10)
 
-st.bar_chart(state_perf)
+fig5 = px.bar(
+    top_states,
+    color=top_states.values,
+    color_continuous_scale=["#ffccbc", "#5d4037"]
+)
+
+fig5.update_layout(height=400)
+st.plotly_chart(fig5, use_container_width=True)
 
 # =========================
-# ORDER LEVEL DATA
+# DATA TABLE
 # =========================
-st.subheader("📋 Order Level Shipment Data")
+st.subheader("📋 Detailed Data")
 
-st.dataframe(filtered_df)
+st.dataframe(filtered_df, use_container_width=True)
