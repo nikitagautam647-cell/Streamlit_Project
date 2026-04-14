@@ -11,7 +11,7 @@ st.title("📦 Nassau Candy Logistics & Sales Dashboard")
 # =========================
 # LOAD DATA
 # =========================
-df = pd.read_excel("nassau_data.xlsx", index_col=0)
+df = pd.read_excel("streamlit excel.xlsx", index_col=0)
 
 # REMOVE UNWANTED COLUMNS
 df = df.loc[:, ~df.columns.str.contains("Unnamed", na=False)]
