@@ -119,3 +119,6 @@ This project is available under the [MIT License](LICENSE).
 ## Contact
 
 For questions or feedback, please open an issue in the repository.
+
+- Name: Nikita Gautam
+- Email: nikitagautm647@gmail.com
