@@ -71,6 +71,10 @@ python -m streamlit run app.py
 
 Then open the URL shown in your browser, typically `http://localhost:8501`.
 
+Alternatively, view the deployed dashboard at:
+
+https://appproject-fztzy8a96wsxcxtuh6x5hr.streamlit.app/
+
 ## Features
 
 - Interactive Streamlit interface
