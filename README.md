@@ -18,13 +18,13 @@ A lightweight Streamlit application for interactive data exploration and visuali
 
 ## Introduction
 
-This project is a Streamlit web application designed to demonstrate an interactive dashboard experience. It is built as a simple app that can be run locally to explore input data and view visual output in a browser.
+This project is a Streamlit web application that provides an interactive logistics dashboard for Nassau Candy Co. It includes filters, KPI cards, and multi-tab analytics for performance overview, delay risk analysis, delivery efficiency, and smart recommendations.
 
 ## Dataset / Inputs
 
-- No dataset is included in this repository by default.
-- If the app requires external data, provide it in a supported format (CSV, Excel, JSON, etc.) and update the app accordingly.
-- Replace this section with specific dataset details if available.
+- The app uses an Excel dataset named `streamlit excel.xlsx`.
+- The data contains order, shipment, and logistics metrics including lead time, sales, gross profit, state, ship mode, and delay status.
+- If you want to run this locally, keep the Excel file in the project root next to `app.py`.
 
 ## Tech Stack
 
@@ -71,7 +71,9 @@ python -m streamlit run app.py
 
 Then open the URL shown in your browser, typically `http://localhost:8501`.
 
-Alternatively, view the deployed dashboard at:
+### Deployed App
+
+View the live dashboard here:
 
 https://appproject-fztzy8a96wsxcxtuh6x5hr.streamlit.app/
 
@@ -84,9 +86,9 @@ https://appproject-fztzy8a96wsxcxtuh6x5hr.streamlit.app/
 
 ## Results / Output
 
-- The app launches in a browser window and displays the dashboard interface.
-- Output depends on the inputs and any data processing logic in `app.py`.
-- Update this section with specific insights once the app logic is finalized.
+- The app displays a rich dashboard with KPI cards, interactive filters, and multiple analytics tabs.
+- Tabs include `Performance Overview`, `Delay Risk Analysis`, `Delivery Efficiency`, and `Smart Recommendations`.
+- The hosted dashboard is available at the deployment link above.
 
 ## Project Structure
 
