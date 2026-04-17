@@ -197,6 +197,16 @@ with tab1:
     fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="State", yaxis_title="Sales")
     c2.plotly_chart(fig2, use_container_width=True)
 
+    fig3 = px.bar(
+        filtered.groupby("State_Province")["Lead_time_actual"].mean().reset_index().sort_values("Lead_time_actual", ascending=False).head(5),
+        x="State_Province",
+        y="Lead_time_actual",
+        color_discrete_sequence=[purple],
+        title="Top 5 States by Average Lead Time"
+    )
+    fig3.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="State", yaxis_title="Avg Lead Time")
+    st.plotly_chart(fig3, use_container_width=True)
+
 # =========================
 # TAB 2
 # =========================
@@ -221,6 +231,16 @@ with tab2:
         )
         fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Ship Mode", yaxis_title="Avg Lead Time")
         c2.plotly_chart(fig2, use_container_width=True)
+
+        fig3 = px.bar(
+            filtered.groupby("Dealyed_shipped")[["Order_ID"]].count().reset_index().sort_values("Order_ID", ascending=False),
+            x="Dealyed_shipped",
+            y="Order_ID",
+            color_discrete_sequence=[purple],
+            title="Order Count by Delay Status"
+        )
+        fig3.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Delay Status", yaxis_title="Order Count")
+        st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
 # TAB 3
@@ -285,12 +305,3 @@ with tab4:
         </div>
         """, unsafe_allow_html=True)
 
-        rec_fig = px.bar(
-            filtered.groupby("State_Province")["Lead_time_actual"].mean().reset_index().sort_values("Lead_time_actual", ascending=False).head(5),
-            x="State_Province",
-            y="Lead_time_actual",
-            color_discrete_sequence=[purple],
-            title="Top 5 States by Average Lead Time"
-        )
-        rec_fig.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="State", yaxis_title="Avg Lead Time")
-        st.plotly_chart(rec_fig, use_container_width=True)
