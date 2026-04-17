@@ -5,35 +5,42 @@ import plotly.express as px
 st.set_page_config(layout="wide")
 
 # =========================
-# LIGHTER CHOCOLATE THEME
+# DARKER CHOCOLATE THEME
 # =========================
 st.markdown("""
 <style>
 .stApp {
-    background: linear-gradient(to right, #b1866d, #c5a188, #d7c2b4);
+    background: linear-gradient(to right, #5d4037, #6d4c41, #8d6e63);
     color: white;
 }
 
 section[data-testid="stSidebar"] {
-    background-color: #6d4c41;
+    background-color: #4e342e;
 }
 
 .card {
-    background-color: #a58274;
+    background-color: #5d4037;
     padding: 18px;
     border-radius: 12px;
     margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0.12);
 }
 
 .kpi {
     font-size: 26px;
     font-weight: bold;
-    color: #ede7f6;
+    color: #ffffff;
 }
 
 /* FILTER TEXT */
 label, .stSelectbox, .stMultiSelect, .stSlider, .stTextInput {
     color: white !important;
+}
+
+/* LINK COLORS */
+a, .stSidebar a {
+    color: #ffcc80 !important;
+    text-decoration: underline !important;
 }
 
 /* TABS */
@@ -110,7 +117,15 @@ st.sidebar.markdown("## 🔗 LinkedIn Connect")
 linkedin = st.sidebar.text_input("Paste LinkedIn profile URL")
 
 if linkedin:
-    st.sidebar.markdown(f"[👉 Open LinkedIn Profile]({linkedin})", unsafe_allow_html=True)
+    linkedin_url = linkedin.strip()
+    if not linkedin_url.lower().startswith("http"):
+        linkedin_url = "https://" + linkedin_url
+    st.sidebar.markdown(
+        f'<a href="{linkedin_url}" target="_blank">👉 Open LinkedIn Profile</a>',
+        unsafe_allow_html=True
+    )
+else:
+    st.sidebar.info("Paste a LinkedIn profile URL to make it visible here.")
 
 # =========================
 # FILTER APPLY
@@ -161,25 +176,60 @@ graph_bg = "#f5f5f5"   # OFF WHITE
 # TAB 1
 # =========================
 with tab1:
-    fig = px.histogram(filtered, x="Lead_time_actual", color_discrete_sequence=[purple])
-    fig.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
-    st.plotly_chart(fig, use_container_width=True)
+    c1, c2 = st.columns(2)
+    fig1 = px.histogram(filtered, x="Lead_time_actual", color_discrete_sequence=[purple])
+    fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
+    c1.plotly_chart(fig1, use_container_width=True)
+
+    fig2 = px.bar(
+        filtered.groupby("State_Province")["Sales"].sum().reset_index().sort_values("Sales", ascending=False),
+        x="State_Province",
+        y="Sales",
+        color_discrete_sequence=[purple]
+    )
+    fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="State", yaxis_title="Sales")
+    c2.plotly_chart(fig2, use_container_width=True)
 
 # =========================
 # TAB 2
 # =========================
 with tab2:
-    fig = px.pie(filtered, names="Dealyed_flag", color_discrete_sequence=[purple, "#d1c4e9"])
-    fig.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
-    st.plotly_chart(fig, use_container_width=True)
+    c1, c2 = st.columns(2)
+    if "Dealyed_flag" in filtered.columns:
+        fig1 = px.pie(filtered, names="Dealyed_flag", color_discrete_sequence=[purple, "#d1c4e9"])
+    else:
+        fig1 = px.pie(filtered, names=filtered.columns[0], color_discrete_sequence=[purple, "#d1c4e9"])
+    fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
+    c1.plotly_chart(fig1, use_container_width=True)
+
+    fig2 = px.bar(
+        filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().reset_index().sort_values("Lead_time_actual", ascending=False),
+        x="Ship_Mode",
+        y="Lead_time_actual",
+        color_discrete_sequence=[purple]
+    )
+    fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Ship Mode", yaxis_title="Avg Lead Time")
+    c2.plotly_chart(fig2, use_container_width=True)
 
 # =========================
 # TAB 3
 # =========================
 with tab3:
-    fig = px.box(filtered, x="Ship_Mode", y="Lead_time_actual", color_discrete_sequence=[purple])
-    fig.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
-    st.plotly_chart(fig, use_container_width=True)
+    c1, c2 = st.columns(2)
+    fig1 = px.box(filtered, x="Ship_Mode", y="Lead_time_actual", color_discrete_sequence=[purple])
+    fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
+    c1.plotly_chart(fig1, use_container_width=True)
+
+    fig2 = px.scatter(
+        filtered,
+        x="Sales",
+        y="Gross_Profit",
+        color="Ship_Mode" if "Ship_Mode" in filtered.columns else None,
+        color_discrete_sequence=[purple],
+        trendline="ols"
+    )
+    fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Sales", yaxis_title="Gross Profit")
+    c2.plotly_chart(fig2, use_container_width=True)
 
 # =========================
 # TAB 4
