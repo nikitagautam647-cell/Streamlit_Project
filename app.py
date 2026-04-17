@@ -5,10 +5,11 @@ import plotly.express as px
 st.set_page_config(layout="wide")
 
 # =========================
-# LIGHTER THEME
+# THEME (PAGE + GRAPH FIX)
 # =========================
 st.markdown("""
 <style>
+/* PAGE BACKGROUND (previous chocolate light theme) */
 .stApp {
     background: linear-gradient(to right, #8d6e63, #a1887f, #bcaaa4);
     color: white;
@@ -34,18 +35,18 @@ section[data-testid="stSidebar"] {
     color: #f3e5f5;
 }
 
-/* Filter text */
+/* FILTER TEXT */
 label, .stSelectbox, .stMultiSelect, .stSlider {
     color: white !important;
 }
 
-/* Tabs (BLACK + BOLD) */
+/* TABS TEXT (BLACK BOLD) */
 button[data-baseweb="tab"] {
     color: black !important;
     font-weight: bold !important;
 }
 
-/* Sidebar text */
+/* SIDEBAR TEXT */
 section[data-testid="stSidebar"] * {
     color: white !important;
 }
@@ -69,7 +70,7 @@ df = pd.read_excel("streamlit excel.xlsx", index_col=0)
 df.columns = df.columns.str.strip()
 
 # =========================
-# DATE FILTER (auto detect)
+# AUTO DATE COLUMN
 # =========================
 date_col = None
 for col in df.columns:
@@ -88,6 +89,7 @@ st.sidebar.title("Smart Filters")
 state = st.sidebar.multiselect("State", df["State_Province"].unique())
 ship = st.sidebar.multiselect("Ship Mode", df["Ship_Mode"].unique())
 
+# ✅ DATE FILTER (BACK AGAIN)
 if date_col:
     date_range = st.sidebar.date_input(
         "Date Range",
@@ -121,6 +123,15 @@ filtered = filtered[
     (filtered["Lead_time_actual"] >= lead[0]) &
     (filtered["Lead_time_actual"] <= lead[1])
 ]
+
+# =========================
+# LINKEDIN CONNECT (BACK)
+# =========================
+st.sidebar.markdown("## 🔗 Connect")
+linkedin = st.sidebar.text_input("LinkedIn Profile URL")
+
+if linkedin:
+    st.sidebar.markdown(f"[Open LinkedIn Profile]({linkedin})")
 
 # =========================
 # KPI CARDS
@@ -168,12 +179,22 @@ tab1, tab2, tab3, tab4 = st.tabs([
 purple = "#9b5de5"
 
 # =========================
+# GRAPH STYLE (OFF WHITE FIX)
+# =========================
+graph_bg = "#f5f5f5"
+
+# =========================
 # TAB 1
 # =========================
 with tab1:
     st.subheader("Performance Overview")
 
     fig1 = px.histogram(filtered, x="Lead_time_actual", color_discrete_sequence=[purple])
+    fig1.update_layout(
+        plot_bgcolor=graph_bg,
+        paper_bgcolor=graph_bg,
+        font_color="black"
+    )
     st.plotly_chart(fig1, use_container_width=True)
 
 # =========================
@@ -183,6 +204,11 @@ with tab2:
     st.subheader("Delay Risk Analysis")
 
     fig2 = px.pie(filtered, names="Dealyed_flag", color_discrete_sequence=[purple, "#d1c4e9"])
+    fig2.update_layout(
+        plot_bgcolor=graph_bg,
+        paper_bgcolor=graph_bg,
+        font_color="black"
+    )
     st.plotly_chart(fig2, use_container_width=True)
 
 # =========================
@@ -192,13 +218,18 @@ with tab3:
     st.subheader("Delivery Efficiency")
 
     fig3 = px.box(filtered, x="Ship_Mode", y="Lead_time_actual", color_discrete_sequence=[purple])
+    fig3.update_layout(
+        plot_bgcolor=graph_bg,
+        paper_bgcolor=graph_bg,
+        font_color="black"
+    )
     st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
-# TAB 4 (IMPROVED SMART RECOMMENDATION)
+# TAB 4 (SMART INSIGHTS)
 # =========================
 with tab4:
-    st.subheader("Smart Recommendations (With Reason Analysis)")
+    st.subheader("Smart Recommendations (With Reason)")
 
     if not filtered.empty:
 
@@ -209,24 +240,19 @@ with tab4:
         worst_ship = filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().idxmax()
         low_profit = filtered.groupby("State_Province")["Gross_Profit"].sum().idxmin()
 
-        # REASONS
-        reason_state = "High delay shipments above average lead time" if top_state != "N/A" else "No major delay found"
-        reason_ship = "This shipping mode has highest average delivery time" 
-        reason_profit = "Low sales volume or high operational cost in this region"
-
         st.markdown(f"""
         <div class="card">
 
         🚨 <b>High Delay State:</b> {top_state}<br>
-        👉 Reason: {reason_state}<br><br>
+        👉 Reason: Orders in this state exceed average delivery time<br><br>
 
         🚚 <b>Slowest Shipping Mode:</b> {worst_ship}<br>
-        👉 Reason: {reason_ship}<br><br>
+        👉 Reason: This mode has highest delivery duration<br><br>
 
         📉 <b>Lowest Profit Region:</b> {low_profit}<br>
-        👉 Reason: {reason_profit}<br><br>
+        👉 Reason: Low revenue + high logistics cost impact<br><br>
 
-        💡 <b>Action:</b> Improve routing, reduce transit time, and optimize cost structure.
+        💡 <b>Action:</b> Improve routing, reduce delay, and optimize cost structure.
 
         </div>
         """, unsafe_allow_html=True)
