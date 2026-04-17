@@ -149,15 +149,22 @@ filtered = filtered[
     (filtered["Lead_time_actual"] <= lead[1])
 ]
 
+has_data = not filtered.empty
+
 # =========================
 # KPI CARDS
 # =========================
 c1, c2, c3, c4 = st.columns(4)
 
-c1.markdown(f"""<div class="card">🎯 Orders<br><div class="kpi">{len(filtered)}</div></div>""", unsafe_allow_html=True)
-c2.markdown(f"""<div class="card">⏱ Avg Delivery<br><div class="kpi">{round(filtered["Lead_time_actual"].mean(),2)}</div></div>""", unsafe_allow_html=True)
-c3.markdown(f"""<div class="card">💰 Profit<br><div class="kpi">{round(filtered["Gross_Profit"].sum(),2)}</div></div>""", unsafe_allow_html=True)
-c4.markdown(f"""<div class="card">📦 Sales<br><div class="kpi">{round(filtered["Sales"].sum(),2)}</div></div>""", unsafe_allow_html=True)
+order_count = len(filtered)
+avg_delivery = round(filtered["Lead_time_actual"].mean(), 2) if has_data else 0
+profit_total = round(filtered["Gross_Profit"].sum(), 2) if has_data else 0
+sales_total = round(filtered["Sales"].sum(), 2) if has_data else 0
+
+c1.markdown(f"""<div class="card">🎯 Orders<br><div class="kpi">{order_count}</div></div>""", unsafe_allow_html=True)
+c2.markdown(f"""<div class="card">⏱ Avg Delivery<br><div class="kpi">{avg_delivery}</div></div>""", unsafe_allow_html=True)
+c3.markdown(f"""<div class="card">💰 Profit<br><div class="kpi">{profit_total}</div></div>""", unsafe_allow_html=True)
+c4.markdown(f"""<div class="card">📦 Sales<br><div class="kpi">{sales_total}</div></div>""", unsafe_allow_html=True)
 
 # =========================
 # TABS
@@ -195,48 +202,65 @@ with tab1:
 # =========================
 with tab2:
     c1, c2 = st.columns(2)
-    if "Dealyed_flag" in filtered.columns:
-        fig1 = px.pie(filtered, names="Dealyed_flag", color_discrete_sequence=[purple, "#d1c4e9"])
+    if not has_data:
+        st.warning("No data available with the current filter selection. Change the filters to see delay-risk charts.")
     else:
-        fig1 = px.pie(filtered, names=filtered.columns[0], color_discrete_sequence=[purple, "#d1c4e9"])
-    fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
-    c1.plotly_chart(fig1, use_container_width=True)
+        if "Dealyed_flag" in filtered.columns:
+            fig1 = px.pie(filtered, names="Dealyed_flag", color_discrete_sequence=[purple, "#d1c4e9"], title="Delay Status Share")
+        else:
+            fig1 = px.pie(filtered, names="Ship_Mode", color_discrete_sequence=[purple, "#d1c4e9"], title="Delay Status Share")
+        fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
+        c1.plotly_chart(fig1, use_container_width=True)
 
-    fig2 = px.bar(
-        filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().reset_index().sort_values("Lead_time_actual", ascending=False),
-        x="Ship_Mode",
-        y="Lead_time_actual",
-        color_discrete_sequence=[purple]
-    )
-    fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Ship Mode", yaxis_title="Avg Lead Time")
-    c2.plotly_chart(fig2, use_container_width=True)
+        fig2 = px.bar(
+            filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().reset_index().sort_values("Lead_time_actual", ascending=False),
+            x="Ship_Mode",
+            y="Lead_time_actual",
+            color_discrete_sequence=[purple],
+            title="Average Lead Time by Ship Mode"
+        )
+        fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Ship Mode", yaxis_title="Avg Lead Time")
+        c2.plotly_chart(fig2, use_container_width=True)
 
 # =========================
 # TAB 3
 # =========================
 with tab3:
     c1, c2 = st.columns(2)
-    fig1 = px.box(filtered, x="Ship_Mode", y="Lead_time_actual", color_discrete_sequence=[purple])
-    fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
-    c1.plotly_chart(fig1, use_container_width=True)
+    if not has_data:
+        st.warning("No data available with the current filter selection. Change the filters to view delivery-efficiency analytics.")
+    else:
+        fig1 = px.box(filtered, x="Ship_Mode", y="Lead_time_actual", color_discrete_sequence=[purple], title="Lead-Time Distribution by Ship Mode")
+        fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
+        c1.plotly_chart(fig1, use_container_width=True)
 
-    fig2 = px.scatter(
-        filtered,
-        x="Sales",
-        y="Gross_Profit",
-        color="Ship_Mode" if "Ship_Mode" in filtered.columns else None,
-        color_discrete_sequence=[purple],
-        trendline="ols"
-    )
-    fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Sales", yaxis_title="Gross Profit")
-    c2.plotly_chart(fig2, use_container_width=True)
+        try:
+            fig2 = px.scatter(
+                filtered,
+                x="Sales",
+                y="Gross_Profit",
+                color="Ship_Mode" if "Ship_Mode" in filtered.columns else None,
+                title="Sales vs Gross Profit",
+                trendline="ols"
+            )
+        except Exception:
+            fig2 = px.scatter(
+                filtered,
+                x="Sales",
+                y="Gross_Profit",
+                color="Ship_Mode" if "Ship_Mode" in filtered.columns else None,
+                title="Sales vs Gross Profit"
+            )
+        fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Sales", yaxis_title="Gross Profit")
+        c2.plotly_chart(fig2, use_container_width=True)
 
 # =========================
 # TAB 4
 # =========================
 with tab4:
-    if not filtered.empty:
-
+    if not has_data:
+        st.warning("No recommendations can be generated because the filtered dataset is empty. Please widen the date range or remove some filters.")
+    else:
         avg_lead = filtered["Lead_time_actual"].mean()
         high_delay = filtered[filtered["Lead_time_actual"] > avg_lead]
 
@@ -248,15 +272,25 @@ with tab4:
         <div class="card">
 
         🚨 <b>High Delay State:</b> {top_state}<br>
-        👉 Reason: Delivery time above average in this region<br><br>
+        👉 Reason: This state has more orders with lead time above the overall average.<br><br>
 
         🚚 <b>Slowest Shipping Mode:</b> {worst_ship}<br>
-        👉 Reason: Highest transit time compared to others<br><br>
+        👉 Reason: It has the highest average lead time among shipping modes.<br><br>
 
         📉 <b>Lowest Profit Region:</b> {low_profit}<br>
-        👉 Reason: Low revenue + high logistics cost<br><br>
+        👉 Reason: It has the lowest gross profit total for the selected filters.<br><br>
 
-        💡 <b>Action:</b> Optimize routes, reduce delays, improve cost efficiency
+        💡 <b>Recommended Action:</b> Focus on faster carriers and improve operations in the high-delay state.
 
         </div>
         """, unsafe_allow_html=True)
+
+        rec_fig = px.bar(
+            filtered.groupby("State_Province")["Lead_time_actual"].mean().reset_index().sort_values("Lead_time_actual", ascending=False).head(5),
+            x="State_Province",
+            y="Lead_time_actual",
+            color_discrete_sequence=[purple],
+            title="Top 5 States by Average Lead Time"
+        )
+        rec_fig.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="State", yaxis_title="Avg Lead Time")
+        st.plotly_chart(rec_fig, use_container_width=True)
