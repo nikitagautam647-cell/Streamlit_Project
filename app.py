@@ -60,12 +60,15 @@ section[data-testid="stSidebar"] * {
 # COMPANY NAME (WHITE)
 # =========================
 st.markdown("""
-<h2 style='color:white; font-weight:bold;'>
-🏢 Nassau Candy Specialty Confections & Fine Food: Factory
-</h2>
+<div style='text-align:left;'>
+<h1 style='color:white; font-weight:bold; font-size:48px; margin-bottom: 6px;'>
+🍬 Nassau Candy Co. Logistics Dashboard
+</h1>
+<h3 style='color:#ffcc80; font-weight:600; margin-top: 0;'>
+Smart Supply Chain & Delivery Intelligence
+</h3>
+</div>
 """, unsafe_allow_html=True)
-
-st.title("🍬 Candy Logistics Intelligence Hub")
 
 # =========================
 # LOAD DATA
