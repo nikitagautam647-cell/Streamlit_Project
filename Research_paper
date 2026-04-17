@@ -1,0 +1,115 @@
+# Research Paper: Nassau Candy Co. Logistics Intelligence Dashboard
+
+## Abstract
+
+This research paper presents the design and development of an interactive logistics intelligence dashboard for Nassau Candy Co. The system integrates production, shipment, and sales data from an Excel dataset to deliver actionable insights through visual analytics, performance KPIs, delay risk analysis, delivery efficiency, and smart recommendations. The dashboard is built using Streamlit, pandas, and Plotly, and supports local execution as well as deployment through Streamlit Cloud.
+
+## Introduction
+
+Supply chain intelligence is critical for manufacturing and distribution companies that need to monitor delivery performance, manage delays, and improve profitability. This project creates a dashboard that connects logistics data, shipping modes, regional performance, and financial metrics, enabling managers to analyze trends and identify improvement opportunities.
+
+## Problem Statement
+
+Nassau Candy Co. required a user-friendly analytics solution to:
+
+- Monitor order volume, delivery lead time, sales, and profit.
+- Compare shipping modes and geographic performance.
+- Identify delay risk factors and low-profit regions.
+- Provide intelligent recommendations based on filtered logistics data.
+
+## Objective
+
+The primary objective is to develop an interactive dashboard that:
+
+- Loads logistics data from an Excel file.
+- Applies filter controls by state, ship mode, date range, and lead time.
+- Displays high-level KPIs, charts, and risk analytics.
+- Provides recommendation insights for better operational decisions.
+- Supports remote deployment and local use.
+
+## Dataset Description
+
+The dataset used in this project is provided in the file streamlit excel.xlsx. Key fields include:
+
+- Order_ID — unique order identifier.
+- Order_Date, Ship_Date — shipment timing information.
+- Lead_time_actual — actual delivery lead time.
+- Dealyed_shipped, Dealyed_flag — shipment delay status.
+- Ship_Mode — transportation method.
+- State_Province, Country_Region, City — location fields.
+- Sales, Gross_Profit, Cost — commercial metrics.
+- Product_ID, Product_Name, Division, Region — product and business segment details.
+
+## Methodology
+
+The dashboard is implemented using the following tools:
+
+- Streamlit for web app UI and interactive controls.
+- pandas for dataset loading, cleaning, and filtering.
+- Plotly Express for chart visualization.
+
+The implementation workflow includes these steps:
+
+1. Load the Excel dataset and normalize column names.
+2. Detect and parse the date column for date filtering.
+3. Build sidebar controls for state, ship mode, date range, lead time, and LinkedIn profile input.
+4. Apply filter logic to the dataset for interactive selection.
+5. Compute KPIs such as order count, average lead time, profit, and sales.
+6. Create multi-tab analytics views for performance, delay risk, delivery efficiency, and recommendations.
+
+## System Design and Dashboard Architecture
+
+The dashboard uses four main tabs:
+
+- **Performance Overview**: Displays lead time distribution, state-wise sales, and top delay lead-time states.
+- **Delay Risk Analysis**: Analyzes delay status, shipping mode performance, and order count by delay state.
+- **Delivery Efficiency**: Presents delivery time distribution by shipping mode and sales vs. profit relationships.
+- **Smart Recommendations**: Offers actionable insights on high-delay states, slow shipping modes, and low-profit regions.
+
+The application uses a dark chocolate theme with a custom sidebar and a branded header for Nassau Candy Co. The design emphasizes readability with bold KPI cards and consistent color styling.
+
+## Implementation Details
+
+Key development aspects include:
+
+- Data filtering is performed dynamically using the sidebar controls. Filtering logic ensures selected states, ship modes, date range, and lead time bounds are applied simultaneously.
+- Conditional handling avoids errors when data subsets are empty. The dashboard displays warning messages when filters produce no matching records.
+- The Smart Recommendations tab computes important indicators such as:
+  - The state with the highest number of above-average lead-time deliveries.
+  - The shipping mode with the highest average lead time.
+  - The region with the lowest total gross profit.
+
+## Results and Findings
+
+The completed dashboard produces the following outcomes:
+
+- Real-time KPI display of order count, average delivery time, total profit, and sales.
+- Visual analytics that reveal shipping mode performance and regional sales distribution.
+- Delay risk analysis that highlights which transport methods and regions are causing the most delay exposure.
+- Delivery efficiency insights showing variation in lead time across shipping modes and the relationship between sales and profitability.
+- Automated recommendations that identify operational focus areas.
+
+### Deployment
+
+The dashboard is deployed live and can be accessed at:
+
+https://appproject-fztzy8a96wsxcxtuh6x5hr.streamlit.app/
+
+## Conclusion
+
+This research project demonstrates how a lightweight Streamlit dashboard can transform logistics and shipment data into actionable business intelligence. The application provides stakeholders with the ability to monitor shipment risk, optimize delivery efficiency, and make data-driven decisions for the Nassau Candy Co. supply chain.
+
+## Future Work
+
+Potential enhancements include:
+
+- Adding forecasting models for delivery lead time and demand.
+- Incorporating inventory and supplier performance metrics.
+- Adding machine learning recommendations for shipment routing.
+- Supporting user authentication and role-based access.
+
+## References
+
+- Streamlit documentation: https://docs.streamlit.io/
+- pandas documentation: https://pandas.pydata.org/
+- Plotly Express documentation: https://plotly.com/python/plotly-express/
