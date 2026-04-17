@@ -5,21 +5,21 @@ import plotly.express as px
 st.set_page_config(layout="wide")
 
 # =========================
-# ORIGINAL PAGE THEME (RESTORED)
+# PAGE THEME (SECOND CODE RESTORED)
 # =========================
 st.markdown("""
 <style>
 .stApp {
-    background: linear-gradient(to right, #2b1d0e, #3e2723, #4e342e);
+    background: linear-gradient(to right, #5a3e36, #6d4c41, #7b5e57);
     color: white;
 }
 
 section[data-testid="stSidebar"] {
-    background-color: #1b0f08;
+    background-color: #3e2723;
 }
 
 .card {
-    background-color: #4e342e;
+    background-color: #6d4c41;
     padding: 18px;
     border-radius: 12px;
     margin-bottom: 12px;
@@ -28,17 +28,28 @@ section[data-testid="stSidebar"] {
 .kpi {
     font-size: 26px;
     font-weight: bold;
-    color: #ff80ab;
+    color: #f3e5f5;
 }
 
-.desc {
-    font-size: 13px;
-    color: #fce4ec;
+/* FILTER TEXT */
+label, .stSelectbox, .stMultiSelect, .stSlider {
+    color: white !important;
 }
 
-/* Tabs text */
+/* SIDEBAR */
+section[data-testid="stSidebar"] * {
+    color: white !important;
+}
+
+/* TABS (ACTIVE TAB RED) */
 button[data-baseweb="tab"] {
     color: black !important;
+    font-weight: bold !important;
+}
+
+/* ACTIVE TAB COLOR FIX */
+button[aria-selected="true"] {
+    color: red !important;
     font-weight: bold !important;
 }
 </style>
@@ -61,7 +72,7 @@ df = pd.read_excel("streamlit excel.xlsx", index_col=0)
 df.columns = df.columns.str.strip()
 
 # =========================
-# DATE COLUMN AUTO DETECT
+# DATE COLUMN
 # =========================
 date_col = None
 for col in df.columns:
@@ -80,7 +91,7 @@ st.sidebar.title("Smart Filters")
 state = st.sidebar.multiselect("State", df["State_Province"].unique())
 ship = st.sidebar.multiselect("Ship Mode", df["Ship_Mode"].unique())
 
-# Date filter (BACK)
+# DATE FILTER
 if date_col:
     date_range = st.sidebar.date_input(
         "Date Range",
@@ -97,16 +108,16 @@ lead = st.sidebar.slider(
 )
 
 # =========================
-# LINKEDIN FIXED (VISIBLE NOW)
+# LINKEDIN FIX (NOW WORKING PROPERLY)
 # =========================
 st.sidebar.markdown("## 🔗 LinkedIn Connect")
-linkedin = st.sidebar.text_input("Enter LinkedIn Profile URL")
+
+linkedin = st.sidebar.text_input("Paste LinkedIn URL")
 
 if linkedin:
-    st.sidebar.markdown(
-        f"<a href='{linkedin}' target='_blank'>👉 Open LinkedIn Profile</a>",
-        unsafe_allow_html=True
-    )
+    st.sidebar.markdown(f"""
+    👉 <a href="{linkedin}" target="_blank">Open LinkedIn Profile</a>
+    """, unsafe_allow_html=True)
 
 # =========================
 # FILTER APPLY
@@ -144,65 +155,29 @@ c4.markdown(f"<div class='card'>📦 Sales<br><div class='kpi'>{round(filtered['
 # TABS
 # =========================
 tab1, tab2, tab3, tab4 = st.tabs([
-    "Performance",
-    "Delay Risk",
-    "Efficiency",
-    "Smart Insights"
+    "Performance Overview",
+    "Delay Risk Analysis",
+    "Delivery Efficiency",
+    "Smart Recommendations"
 ])
 
 purple = "#9b5de5"
 graph_bg = "#f5f5f5"
 
-# =========================
-# TAB 1
-# =========================
 with tab1:
     fig = px.histogram(filtered, x="Lead_time_actual", color_discrete_sequence=[purple])
     fig.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg)
     st.plotly_chart(fig, use_container_width=True)
 
-# =========================
-# TAB 2
-# =========================
 with tab2:
     fig = px.pie(filtered, names="Dealyed_flag", color_discrete_sequence=[purple, "#d1c4e9"])
     fig.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg)
     st.plotly_chart(fig, use_container_width=True)
 
-# =========================
-# TAB 3
-# =========================
 with tab3:
     fig = px.box(filtered, x="Ship_Mode", y="Lead_time_actual", color_discrete_sequence=[purple])
     fig.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg)
     st.plotly_chart(fig, use_container_width=True)
 
-# =========================
-# TAB 4 (IMPROVED INSIGHTS)
-# =========================
 with tab4:
-    if not filtered.empty:
-
-        avg = filtered["Lead_time_actual"].mean()
-        high_delay = filtered[filtered["Lead_time_actual"] > avg]
-
-        top_state = high_delay["State_Province"].mode()[0] if not high_delay.empty else "N/A"
-        worst_ship = filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().idxmax()
-        low_profit = filtered.groupby("State_Province")["Gross_Profit"].sum().idxmin()
-
-        st.markdown(f"""
-        <div class="card">
-
-        🚨 <b>High Delay State:</b> {top_state}<br>
-        👉 More orders exceed average delivery time in this region.<br><br>
-
-        🚚 <b>Slow Shipping Mode:</b> {worst_ship}<br>
-        👉 This mode consistently shows higher delivery time.<br><br>
-
-        📉 <b>Low Profit Region:</b> {low_profit}<br>
-        👉 Revenue is low compared to operational cost.<br><br>
-
-        💡 <b>Action:</b> Optimize routing + reduce shipping delay + cost control.
-
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown("### Smart Insights")
