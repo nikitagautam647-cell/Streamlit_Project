@@ -5,35 +5,49 @@ import plotly.express as px
 st.set_page_config(layout="wide")
 
 # =========================
-# THEME (Light Chocolate + Purple Graphs)
+# LIGHTER THEME
 # =========================
 st.markdown("""
 <style>
 .stApp {
-    background: linear-gradient(to right, #5a3e36, #6d4c41, #7b5e57);
+    background: linear-gradient(to right, #8d6e63, #a1887f, #bcaaa4);
     color: white;
 }
 
+/* Sidebar */
 section[data-testid="stSidebar"] {
-    background-color: #3e2723;
+    background-color: #5d4037;
 }
 
+/* Cards */
 .card {
-    background-color: #6d4c41;
+    background-color: #7b5e57;
     padding: 18px;
     border-radius: 12px;
     margin-bottom: 12px;
 }
 
+/* KPI */
 .kpi {
     font-size: 26px;
     font-weight: bold;
-    color: #ffb74d;
+    color: #f3e5f5;
 }
 
-.desc {
-    font-size: 13px;
-    color: #ffe0b2;
+/* Filter text */
+label, .stSelectbox, .stMultiSelect, .stSlider {
+    color: white !important;
+}
+
+/* Tabs (BLACK + BOLD) */
+button[data-baseweb="tab"] {
+    color: black !important;
+    font-weight: bold !important;
+}
+
+/* Sidebar text */
+section[data-testid="stSidebar"] * {
+    color: white !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -41,7 +55,10 @@ section[data-testid="stSidebar"] {
 # =========================
 # COMPANY NAME
 # =========================
-st.markdown("<h2 style='color:white;'>🏢 Nassau Candy Specialty Confections & Fine Food: Factory</h2>", unsafe_allow_html=True)
+st.markdown(
+    "<h2 style='color:white;'>🏢 Nassau Candy Specialty Confections & Fine Food: Factory</h2>",
+    unsafe_allow_html=True
+)
 
 st.title("🍬 Candy Logistics Intelligence Hub")
 
@@ -52,7 +69,7 @@ df = pd.read_excel("streamlit excel.xlsx", index_col=0)
 df.columns = df.columns.str.strip()
 
 # =========================
-# DATE HANDLING (AUTO DETECT)
+# DATE FILTER (auto detect)
 # =========================
 date_col = None
 for col in df.columns:
@@ -71,14 +88,10 @@ st.sidebar.title("Smart Filters")
 state = st.sidebar.multiselect("State", df["State_Province"].unique())
 ship = st.sidebar.multiselect("Ship Mode", df["Ship_Mode"].unique())
 
-# Date filter (only if available)
 if date_col:
-    min_date = df[date_col].min()
-    max_date = df[date_col].max()
-
     date_range = st.sidebar.date_input(
         "Date Range",
-        [min_date, max_date]
+        [df[date_col].min(), df[date_col].max()]
     )
 else:
     date_range = None
@@ -118,39 +131,29 @@ c1.markdown(f"""
 <div class="card">
 🎯 Orders<br>
 <div class="kpi">{len(filtered)}</div>
-<p class="desc">Total processed shipments</p>
 </div>
 """, unsafe_allow_html=True)
 
 c2.markdown(f"""
 <div class="card">
-⏱ Avg Delivery Time<br>
+⏱ Avg Delivery<br>
 <div class="kpi">{round(filtered["Lead_time_actual"].mean(),2)}</div>
 </div>
 """, unsafe_allow_html=True)
 
 c3.markdown(f"""
 <div class="card">
-💰 Total Profit<br>
+💰 Profit<br>
 <div class="kpi">{round(filtered["Gross_Profit"].sum(),2)}</div>
 </div>
 """, unsafe_allow_html=True)
 
 c4.markdown(f"""
 <div class="card">
-📦 Total Sales<br>
+📦 Sales<br>
 <div class="kpi">{round(filtered["Sales"].sum(),2)}</div>
 </div>
 """, unsafe_allow_html=True)
-
-# =========================
-# LINKEDIN ADD
-# =========================
-st.sidebar.markdown("## 🔗 Connect")
-linkedin = st.sidebar.text_input("LinkedIn Profile URL")
-
-if linkedin:
-    st.sidebar.markdown(f"[Open LinkedIn Profile]({linkedin})")
 
 # =========================
 # TABS
@@ -170,24 +173,8 @@ purple = "#9b5de5"
 with tab1:
     st.subheader("Performance Overview")
 
-    col1, col2 = st.columns(2)
-
-    fig1 = px.histogram(
-        filtered,
-        x="Lead_time_actual",
-        color_discrete_sequence=[purple]
-    )
-    fig1.update_layout(plot_bgcolor="#7b5e57", paper_bgcolor="#7b5e57", font_color="white")
-    col1.plotly_chart(fig1, use_container_width=True)
-
-    fig2 = px.bar(
-        filtered.groupby("State_Province")["Gross_Profit"].sum().reset_index(),
-        x="State_Province",
-        y="Gross_Profit",
-        color_discrete_sequence=[purple]
-    )
-    fig2.update_layout(plot_bgcolor="#7b5e57", paper_bgcolor="#7b5e57", font_color="white")
-    col2.plotly_chart(fig2, use_container_width=True)
+    fig1 = px.histogram(filtered, x="Lead_time_actual", color_discrete_sequence=[purple])
+    st.plotly_chart(fig1, use_container_width=True)
 
 # =========================
 # TAB 2
@@ -195,26 +182,8 @@ with tab1:
 with tab2:
     st.subheader("Delay Risk Analysis")
 
-    col1, col2 = st.columns(2)
-
-    fig3 = px.pie(
-        filtered,
-        names="Dealyed_flag",
-        color_discrete_sequence=[purple, "#d1c4e9"]
-    )
-    fig3.update_layout(plot_bgcolor="#7b5e57", paper_bgcolor="#7b5e57", font_color="white")
-    col1.plotly_chart(fig3, use_container_width=True)
-
-    delay_ship = filtered.groupby("Ship_Mode")["Dealyed_flag"].count().reset_index()
-
-    fig4 = px.bar(
-        delay_ship,
-        x="Ship_Mode",
-        y="Dealyed_flag",
-        color_discrete_sequence=[purple]
-    )
-    fig4.update_layout(plot_bgcolor="#7b5e57", paper_bgcolor="#7b5e57", font_color="white")
-    col2.plotly_chart(fig4, use_container_width=True)
+    fig2 = px.pie(filtered, names="Dealyed_flag", color_discrete_sequence=[purple, "#d1c4e9"])
+    st.plotly_chart(fig2, use_container_width=True)
 
 # =========================
 # TAB 3
@@ -222,33 +191,14 @@ with tab2:
 with tab3:
     st.subheader("Delivery Efficiency")
 
-    col1, col2 = st.columns(2)
-
-    fig5 = px.box(
-        filtered,
-        x="Ship_Mode",
-        y="Lead_time_actual",
-        color_discrete_sequence=[purple]
-    )
-    fig5.update_layout(plot_bgcolor="#7b5e57", paper_bgcolor="#7b5e57", font_color="white")
-    col1.plotly_chart(fig5, use_container_width=True)
-
-    route_perf = filtered.groupby("Routes")["Lead_time_actual"].mean().reset_index()
-
-    fig6 = px.bar(
-        route_perf,
-        x="Routes",
-        y="Lead_time_actual",
-        color_discrete_sequence=[purple]
-    )
-    fig6.update_layout(plot_bgcolor="#7b5e57", paper_bgcolor="#7b5e57", font_color="white")
-    col2.plotly_chart(fig6, use_container_width=True)
+    fig3 = px.box(filtered, x="Ship_Mode", y="Lead_time_actual", color_discrete_sequence=[purple])
+    st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
-# TAB 4
+# TAB 4 (IMPROVED SMART RECOMMENDATION)
 # =========================
 with tab4:
-    st.subheader("Smart Recommendations")
+    st.subheader("Smart Recommendations (With Reason Analysis)")
 
     if not filtered.empty:
 
@@ -259,14 +209,24 @@ with tab4:
         worst_ship = filtered.groupby("Ship_Mode")["Lead_time_actual"].mean().idxmax()
         low_profit = filtered.groupby("State_Province")["Gross_Profit"].sum().idxmin()
 
+        # REASONS
+        reason_state = "High delay shipments above average lead time" if top_state != "N/A" else "No major delay found"
+        reason_ship = "This shipping mode has highest average delivery time" 
+        reason_profit = "Low sales volume or high operational cost in this region"
+
         st.markdown(f"""
         <div class="card">
 
-        🚨 <b>High Delay State:</b> {top_state}<br><br>
+        🚨 <b>High Delay State:</b> {top_state}<br>
+        👉 Reason: {reason_state}<br><br>
 
-        🚚 <b>Slowest Shipping Mode:</b> {worst_ship}<br><br>
+        🚚 <b>Slowest Shipping Mode:</b> {worst_ship}<br>
+        👉 Reason: {reason_ship}<br><br>
 
-        📉 <b>Lowest Profit Region:</b> {low_profit}
+        📉 <b>Lowest Profit Region:</b> {low_profit}<br>
+        👉 Reason: {reason_profit}<br><br>
+
+        💡 <b>Action:</b> Improve routing, reduce transit time, and optimize cost structure.
 
         </div>
         """, unsafe_allow_html=True)
