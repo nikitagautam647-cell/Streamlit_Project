@@ -91,3 +91,7 @@ The dashboard features:
 This research provides a comprehensive framework for enhancing shipping route efficiency at Nassau Candy Distributor. By leveraging EDA and interactive tools, stakeholders can make informed decisions to improve logistics performance. Future studies should explore advanced modeling techniques for predictive analytics.
 
 ## References
+
+- Streamlit documentation: https://docs.streamlit.io/
+- pandas documentation: https://pandas.pydata.org/
+- Plotly Express documentation: https://plotly.com/python/plotly-express/
