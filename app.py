@@ -188,7 +188,21 @@ graph_bg = "#f5f5f5"   # OFF WHITE
 with tab1:
     c1, c2 = st.columns(2)
     fig1 = px.histogram(filtered, x="Lead_time_actual", color_discrete_sequence=[purple])
-    fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
+    fig1.update_layout(
+        plot_bgcolor=graph_bg, 
+        paper_bgcolor=graph_bg, 
+        font_color="black",
+        xaxis_title="Lead Time Actual",
+        yaxis_title="Count",
+        xaxis=dict(
+            title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+            tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+        ),
+        yaxis=dict(
+            title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+            tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+        )
+    )
     c1.plotly_chart(fig1, use_container_width=True)
 
     fig2 = px.bar(
@@ -197,7 +211,21 @@ with tab1:
         y="Sales",
         color_discrete_sequence=[purple]
     )
-    fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="State", yaxis_title="Sales")
+    fig2.update_layout(
+        plot_bgcolor=graph_bg, 
+        paper_bgcolor=graph_bg, 
+        font_color="black", 
+        xaxis_title="State", 
+        yaxis_title="Sales",
+        xaxis=dict(
+            title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+            tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+        ),
+        yaxis=dict(
+            title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+            tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+        )
+    )
     c2.plotly_chart(fig2, use_container_width=True)
 
     fig3 = px.bar(
@@ -207,7 +235,21 @@ with tab1:
         color_discrete_sequence=[purple],
         title="Top 5 States by Average Lead Time"
     )
-    fig3.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="State", yaxis_title="Avg Lead Time")
+    fig3.update_layout(
+        plot_bgcolor=graph_bg, 
+        paper_bgcolor=graph_bg, 
+        font_color="black", 
+        xaxis_title="State", 
+        yaxis_title="Avg Lead Time",
+        xaxis=dict(
+            title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+            tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+        ),
+        yaxis=dict(
+            title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+            tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+        )
+    )
     st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
@@ -232,7 +274,21 @@ with tab2:
             color_discrete_sequence=[purple],
             title="Average Lead Time by Ship Mode"
         )
-        fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Ship Mode", yaxis_title="Avg Lead Time")
+        fig2.update_layout(
+            plot_bgcolor=graph_bg, 
+            paper_bgcolor=graph_bg, 
+            font_color="black", 
+            xaxis_title="Ship Mode", 
+            yaxis_title="Avg Lead Time",
+            xaxis=dict(
+                title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+                tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+            ),
+            yaxis=dict(
+                title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+                tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+            )
+        )
         c2.plotly_chart(fig2, use_container_width=True)
 
         fig3 = px.bar(
@@ -242,7 +298,21 @@ with tab2:
             color_discrete_sequence=[purple],
             title="Order Count by Delay Status"
         )
-        fig3.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Delay Status", yaxis_title="Order Count")
+        fig3.update_layout(
+            plot_bgcolor=graph_bg, 
+            paper_bgcolor=graph_bg, 
+            font_color="black", 
+            xaxis_title="Delay Status", 
+            yaxis_title="Order Count",
+            xaxis=dict(
+                title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+                tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+            ),
+            yaxis=dict(
+                title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+                tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+            )
+        )
         st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
@@ -254,7 +324,21 @@ with tab3:
         st.warning("No data available with the current filter selection. Change the filters to view delivery-efficiency analytics.")
     else:
         fig1 = px.box(filtered, x="Ship_Mode", y="Lead_time_actual", color_discrete_sequence=[purple], title="Lead-Time Distribution by Ship Mode")
-        fig1.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black")
+        fig1.update_layout(
+            plot_bgcolor=graph_bg, 
+            paper_bgcolor=graph_bg, 
+            font_color="black",
+            xaxis_title="Ship Mode",
+            yaxis_title="Lead Time Actual",
+            xaxis=dict(
+                title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+                tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+            ),
+            yaxis=dict(
+                title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+                tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+            )
+        )
         c1.plotly_chart(fig1, use_container_width=True)
 
         try:
@@ -274,7 +358,21 @@ with tab3:
                 color="Ship_Mode" if "Ship_Mode" in filtered.columns else None,
                 title="Sales vs Gross Profit"
             )
-        fig2.update_layout(plot_bgcolor=graph_bg, paper_bgcolor=graph_bg, font_color="black", xaxis_title="Sales", yaxis_title="Gross Profit")
+        fig2.update_layout(
+            plot_bgcolor=graph_bg, 
+            paper_bgcolor=graph_bg, 
+            font_color="black", 
+            xaxis_title="Sales", 
+            yaxis_title="Gross Profit",
+            xaxis=dict(
+                title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+                tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+            ),
+            yaxis=dict(
+                title_font=dict(color="black", size=14, family="Arial", weight="bold"),
+                tickfont=dict(color="black", size=12, family="Arial", weight="bold")
+            )
+        )
         c2.plotly_chart(fig2, use_container_width=True)
 
 # =========================
