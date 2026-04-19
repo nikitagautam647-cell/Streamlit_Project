@@ -1,155 +1,25 @@
-# Factory-to-Customer Shipping Route Efficiency Analysis for Nassau Candy Distributor
-
-## Abstract
-
-In the whimsical world of confectionery, where golden tickets and chocolate rivers reign supreme, Nassau Candy Distributor stands as a beacon of sugary delights. Yet, beneath the sweet facade lies a labyrinth of logistics challenges. This research paper embarks on a journey through the candy-coated corridors of supply chain efficiency, unveiling a data-driven odyssey to optimize factory-to-customer shipping routes. By harnessing the power of analytics, we transform raw shipment data into a symphony of insights, enabling Nassau Candy to deliver joy faster, cheaper, and more reliably across the nation. Through meticulous data cleaning, innovative feature engineering, and interactive visualization, we craft a roadmap for route mastery, turning potential bottlenecks into streams of seamless delivery.
-
-## Background and Context
-
-Imagine a universe where factories churn out Wonka Bars and Fizzy Lifting Drinks, dispatching them via magical (and mundane) shipping modes to eager customers nationwide. Nassau Candy Distributor, inspired by the legendary Willy Wonka, operates as a national powerhouse, bridging the gap between whimsical production and delighted consumption. But in this real-world Wonka factory, shipping efficiency isn't just about avoiding Oompa Loompas—it's about customer satisfaction, cost control, and scalability.
-
-Shipping routes are the veins of this candy empire: efficient ones pump profits, while clogged ones lead to delays and dissatisfaction. Despite a treasure trove of order and shipment data, decisions often rely on guesswork rather than golden data. This project illuminates the shadows, providing clarity on route performance, regional bottlenecks, and ship mode magic.
-
-## Problem Statement
-
-Nassau Candy Distributor faces a conundrum as perplexing as a chocolate puzzle: without route-level intelligence, logistics remain a game of chance. Key mysteries include:
-
-- Which factory-to-customer routes glide like golden geese, and which stumble like sticky taffy?
-- Where do delays lurk, turning sweet shipments sour?
-- How do shipping performances dance across regions, states, and modes?
-- Which geographic bottlenecks threaten the candy cascade?
-
-Without these answers, optimization is reactive, like chasing runaway Gobstoppers. This analysis bridges the gap, transforming data into a crystal-clear vision for proactive, data-driven logistics.
-
-## Dataset Fields Description
-
-Our dataset is a candy-coated chronicle, with fields that paint a vivid picture of the shipping saga:
+Dataset Fields Description
 
 | Field              | Description                                      |
 |--------------------|--------------------------------------------------|
-| Row ID            | Unique row identifier, like a serial number on a chocolate bar |
-| Order ID          | Unique order identifier, the golden ticket of each transaction |
-| Order Date        | Date of order, when the candy craving begins     |
-| Ship Date         | Date of shipment, the launch of the sugary journey |
-| Ship Mode         | Shipping method, from standard to expedited, like choosing a boat or a flying elevator |
-| Customer ID       | Unique customer identifier, the face behind the feast |
-| Country/Region    | Country or region of customer, the land of plenty |
-| City              | City of customer, the urban candy hub            |
-| State/Province    | State/province of customer, the regional realm   |
-| Postal Code       | Postal code / zip code, the precise portal       |
-| Division          | Product division, chocolate, sugar, or other wonders |
-| Region            | Region of customer, the broader candy kingdom    |
-| Product ID        | Unique product identifier, the essence of each treat |
-| Product Name      | Product long name, from Wonka Bar to Fizzy Lifting Drinks |
-| Sales             | Total sales value, the monetary magic             |
-| Units             | Total units, the quantity of joy                 |
-| Gross Profit      | Gross profit (Sales - Cost), the sweet surplus   |
-| Cost              | Cost to manufacture, the hidden ingredients      |
-
-## Analytical Methodology (Step-by-Step)
-
-Our analytical alchemy follows a recipe for route enlightenment:
-
-### 1. Data Cleaning & Validation
-- **Date Validation**: Ensure dates are properly formatted, banishing any rogue entries that could sour the batch.
-- **Lead Time Scrutiny**: Remove invalid or negative lead times, as time travel isn't in our shipping repertoire.
-- **Missing Records**: Handle absent shipment data with grace, filling gaps or flagging anomalies.
-- **Geographic Standardization**: Harmonize fields like states and regions, ensuring consistency across the candy map.
-
-### 2. Feature Engineering
-- **Shipping Lead Time Calculation**: Compute days from order to ship, the heartbeat of efficiency.
-- **Route Categorization**: Define routes as Factory → Customer Region/State, grouping shipments by origin and destination.
-- **Ship Mode Grouping**: Cluster by shipping method, from leisurely standard to speedy expedited.
-
-### 3. Route Definition & Aggregation
-Each route is a unique path: Factory Location → Customer State/Region. For every route, we aggregate:
-- **Total Shipments**: Volume of candy caravans.
-- **Average Lead Time**: Mean duration, the pulse of punctuality.
-- **Lead Time Variability**: Standard deviation, measuring the wobble in the Wonka wheel.
-
-### 4. Efficiency Benchmarking
-- **Ranking Routes**: From fastest (golden ticket winners) to slowest (sticky losers).
-- **Top/Bottom Performers**: Spotlight the top 10 efficient routes and bottom 10 bottlenecks.
-- **Ship Mode Comparison**: Cross-analyze performance across modes, weighing speed vs. cost.
-
-### 5. Geographic Bottleneck Analysis
-- **High Lead Time Regions**: Identify areas where delays dwell.
-- **Congestion Hotspots**: Pinpoint states/regions with high volume and poor performance, like traffic jams in the chocolate factory.
-
-### 6. Ship Mode Performance Analysis
-- **Efficiency Comparison**: Pit standard vs. expedited, evaluating time-cost tradeoffs.
-- **Descriptive Insights**: Narrate the balance between swift delivery and fiscal prudence.
-
-## Key Performance Indicators (KPIs)
-
-Our KPIs are the dashboard's delicious metrics:
-
-| KPI                     | Description                                      |
-|-------------------------|--------------------------------------------------|
-| Shipping Lead Time     | Ship Date − Order Date, the raw rhythm of routes |
-| Average Lead Time      | Mean duration per route, the steady beat         |
-| Route Volume           | Order count per route, the traffic flow          |
-| Delay Frequency        | % of shipments exceeding thresholds, the delay danger |
-| Route Efficiency Score | Normalized lead-time performance, the efficiency elixir |
-
-## Streamlit Web Application Requirements
-
-The dashboard is our interactive candy cart, built with Streamlit for seamless exploration.
-
-### Dashboard Modules
-- **Route Efficiency Overview**: Average lead times by route, with leaderboards ranking the swiftest paths.
-- **Geographic Shipping Map**: A US heatmap glowing with efficiency hues, visualizing regional bottlenecks like a Wonka weather map.
-- **Ship Mode Comparison**: Lead time showdowns by method, highlighting tradeoffs.
-- **Route Drill-Down**: State-level deep dives and order timelines, zooming into the details.
-
-### User Capabilities
-- **Filters**: Date range, region/state selectors, ship mode toggles, lead-time sliders—customize your candy quest.
-- **Interactivity**: Drill into routes, compare modes, and uncover hidden efficiencies.
-
-## Deliverables and Submission
-
-Our confectionery contributions include:
-- **Research Paper**: This EDA extravaganza, brimming with insights and recommendations.
-- **Streamlit Dashboard**: A live analytics portal, deployed for real-time route revelation.
-- **Executive Summary**: A bite-sized briefing for stakeholders, sweet and succinct.
-
-## Factories Coordinates
-
-Our factories are scattered like hidden treasures:
-
-| Factory          | Latitude    | Longitude    |
-|------------------|-------------|--------------|
-| Lot's O' Nuts   | 32.881893  | -111.768036 |
-| Wicked Choccy's | 32.076176  | -81.088371  |
-| Sugar Shack     | 48.11914   | -96.18115   |
-| Secret Factory  | 41.446333  | -90.565487  |
-| The Other Factory| 35.1175    | -89.971107  |
-
-## Products and Factories Correlation
-
-Each product ties to its factory forge:
-
-| Division | Product Name                  | Factory          |
-|----------|-------------------------------|------------------|
-| Chocolate| Wonka Bar - Nutty Crunch Surprise | Lot's O' Nuts   |
-| Chocolate| Wonka Bar - Fudge Mallows    | Lot's O' Nuts   |
-| Chocolate| Wonka Bar - Scrumdiddlyumptious | Lot's O' Nuts   |
-| Chocolate| Wonka Bar - Milk Chocolate   | Wicked Choccy's |
-| Chocolate| Wonka Bar - Triple Dazzle Caramel | Wicked Choccy's |
-| Sugar    | Laffy Taffy                   | Sugar Shack     |
-| Sugar    | SweeTARTS                     | Sugar Shack     |
-| Sugar    | Nerds                         | Sugar Shack     |
-| Sugar    | Fun Dip                       | Sugar Shack     |
-| Other    | Fizzy Lifting Drinks          | Sugar Shack     |
-| Sugar    | Everlasting Gobstopper        | Secret Factory  |
-| Sugar    | Hair Toffee                   | The Other Factory |
-| Other    | Lickable Wallpaper            | Secret Factory  |
-| Other    | Wonka Gum                     | Secret Factory  |
-| Other    | Kazookles                     | The Other Factory |
-
-## Conclusion
-
-This project unwraps the secrets of Nassau Candy's shipping routes, transforming data into a delightful dashboard of efficiency. By mapping factories to customers, benchmarking routes, and visualizing bottlenecks, we empower data-driven decisions that enhance delivery reliability and customer joy. In the end, it's not just about candy—it's about crafting a supply chain as magical as Willy Wonka's world, where every shipment arrives on time, every time. May your routes be swift, your profits plentiful, and your logistics as enchanting as an everlasting Gobstopper!
+| Row ID            | Unique row identifier                            |
+| Order ID          | Unique order identifier                          |
+| Order Date        | Date of order                                    |
+| Ship Date         | Date of shipment                                 |
+| Ship Mode         | Shipping method of order                         |
+| Customer ID       | Unique customer identifier                       |
+| Country/Region    | Country or region of customer                    |
+| City              | City of customer                                 |
+| State/Province    | State/province of customer                       |
+| Postal Code       | Postal code / zip code of customer               |
+| Division          | Product division                                 |
+| Region            | Region of customer                               |
+| Product ID        | Unique product identifier                        |
+| Product Name      | Product long name                                |
+| Sales             | Total sales value of order                       |
+| Units             | Total units of order                             |
+| Gross Profit      | Gross profit of order ( Sales - Cost )           |
+| Cost              | Cost to manufacture                              |
 
 ## Future Work
 
