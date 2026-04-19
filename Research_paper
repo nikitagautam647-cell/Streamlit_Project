@@ -10,12 +10,6 @@ In the competitive landscape of consumer goods distribution, efficient supply ch
 
 This paper aims to analyze shipment data to uncover patterns in route efficiency. By employing EDA techniques, we provide insights into performance metrics and propose actionable recommendations. The research contributes to the field of logistics optimization by demonstrating the application of data analytics in a real-world manufacturing context.
 
-## Literature Review
-
-Existing literature on supply chain efficiency emphasizes the role of data analytics in identifying bottlenecks (Smith et al., 2020). Studies on shipping route optimization highlight the benefits of geographic information systems (GIS) and machine learning models (Johnson & Lee, 2019). In the confectionery industry, research on distribution challenges is limited, but parallels can be drawn from food manufacturing sectors where lead time reduction improves customer satisfaction (Garcia et al., 2021).
-
-Key gaps include the lack of factory-specific route analysis and interactive visualization tools for stakeholders.
-
 ## Methodology
 
 ### Data Collection
@@ -37,8 +31,11 @@ Data was sourced from Nassau Candy Distributor's internal records, including ord
 - Geographic mapping for bottleneck identification.
 
 ### Tools
-- Python (Pandas, Plotly) for analysis.
-- Streamlit for dashboard development.
+- Excel for data handling and initial analysis.
+- Power BI for advanced visualizations and reporting.
+- GitHub for version control and collaboration.
+- Streamlit for interactive dashboard development.
+- SQL for data querying and manipulation.
 
 ## Results
 
@@ -94,27 +91,3 @@ The dashboard features:
 This research provides a comprehensive framework for enhancing shipping route efficiency at Nassau Candy Distributor. By leveraging EDA and interactive tools, stakeholders can make informed decisions to improve logistics performance. Future studies should explore advanced modeling techniques for predictive analytics.
 
 ## References
-
-- Garcia, A., et al. (2021). Logistics in Food Manufacturing. Journal of Supply Chain Management.
-- Johnson, R., & Lee, S. (2019). Route Optimization Using GIS. Transportation Research.
-- Smith, T., et al. (2020). Data Analytics in Supply Chains. International Journal of Logistics.
-
-## Appendices
-
-- Data summary tables.
-- Additional visualizations.
-
-## Future Work
-
-Potential enhancements include:
-
-- Adding forecasting models for delivery lead time and demand.
-- Incorporating inventory and supplier performance metrics.
-- Adding machine learning recommendations for shipment routing.
-- Supporting user authentication and role-based access.
-
-## References
-
-- Streamlit documentation: https://docs.streamlit.io/
-- pandas documentation: https://pandas.pydata.org/
-- Plotly Express documentation: https://plotly.com/python/plotly-express/
